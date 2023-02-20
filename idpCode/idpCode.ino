@@ -12,21 +12,26 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
 
 // Pins initalised
 const int followPin1 = 9; //Left
-const int followPin2 = 9; //Centre
-const int followPin3 = 9; //Right
+const int followPin2 = 10; //Centre
+const int followPin3 = 11; //Right
 
 
 
 // Variables initialised
 int followLeftV = 1;
-bool followCentreV = 1;
-bool followRightV = 1;
+int followCentreV = 1;
+int followRightV = 1;
+
+// defining speed of robot
+int speed = 100;
 
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("IDP");
   pinMode(followPin1, INPUT);
+  pinMode(followPin2, INPUT);
+  pinMode(followPin3, INPUT);
 
 // Check that motor shield has been found
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
@@ -48,10 +53,45 @@ void setup() {
 void loop() {
 
 
+  // obtain digital reading from each pin
   while(1) {
     followLeftV = digitalRead(followPin1);
-    Serial.println(followLeftV);
-    delay(300);
+    Serial.println("left sensor: "+followLeftV);
+    delay(100);
+
+    followCentreV = digitalRead(followPin2);
+    Serial.println("central sensor: "+followCentreV);
+    delay(100);
+
+    followRightV = digitalRead(followPin3);
+    Serial.println("right sensor: "+followRightV);
+    delay(100);
   }
+
+  if (followleftV==0 && followCentreV==1 && followRightV==0) {
+    moveForward;
+    Serial.println("moving forward");
+    delay(100);
+  }
+  
+  ///else if (followleftV==1 && followCentreV==0 && followRightV==0) {turnLeft;}
+  // else if (followleftV==0 && followCentreV==0 && followRightV==1) {turnRight;}
+  // would have more for other situations
+}
+
+
+void moveForward() {
+
+}
+
+void turnLeft() {
+
+}
+
+void turnRight() {
+
+}
+
+void stopMoving() {
 
 }
