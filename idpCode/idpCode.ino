@@ -1,71 +1,70 @@
 /*
-  Blink without Delay
+This is a test sketch for the Adafruit assembled Motor Shield for Arduino v2
+It won't work with v1.x motor shields! Only for the v2's with built in PWM
+control
 
-  Turns on and off a light emitting diode (LED) connected to a digital pin,
-  without using the delay() function. This means that other code can run at the
-  same time without being interrupted by the LED code.
-
-  The circuit:
-  - Use the onboard LED.
-  - Note: Most Arduinos have an on-board LED you can control. On the UNO, MEGA
-    and ZERO it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN
-    is set to the correct LED pin independent of which board is used.
-    If you want to know what pin the on-board LED is connected to on your
-    Arduino model, check the Technical Specs of your board at:
-    https://www.arduino.cc/en/Main/Products
-
-  created 2005
-  by David A. Mellis
-  modified 8 Feb 2010
-  by Paul Stoffregen
-  modified 11 Nov 2013
-  by Scott Fitzgerald
-  modified 9 Jan 2017
-  by Arturo Guadalupi
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/BlinkWithoutDelay
+For use with the Adafruit Motor Shield v2
+---->	http://www.adafruit.com/products/1438
 */
 
-// constants won't change. Used here to set a pin number:
-const int ledPin = LED_BUILTIN;  // the number of the LED pin
+#include <Adafruit_MotorShield.h>
 
-// Variables will change:
-int ledState = LOW;  // ledState used to set the LED
+// Create the motor shield object with the default I2C address
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+// Or, create it with a different I2C address (say for stacking)
+// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
 
-// Generally, you should use "unsigned long" for variables that hold time
-// The value will quickly become too large for an int to store
-unsigned long previousMillis = 0;  // will store last time LED was updated
-
-// constants won't change:
-const long interval = 1000;  // interval at which to blink (milliseconds)
+// Select which 'port' M1, M2, M3 or M4. In this case, M1
+Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
+// You can also make another motor on port M2
+//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
 
 void setup() {
-  // set the digital pin as output:
-  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+  }
+  Serial.println("Motor Shield found.");
+
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  myMotor->setSpeed(150);
+  myMotor->run(FORWARD);
+  // turn on motor
+  myMotor->run(RELEASE);
 }
 
 void loop() {
-  // here is where you'd put code that needs to be running all the time.
+  uint8_t i;
 
-  // check to see if it's time to blink the LED; that is, if the difference
-  // between the current time and last time you blinked the LED is bigger than
-  // the interval at which you want to blink the LED.
-  unsigned long currentMillis = millis();
+  Serial.print("tick");
 
-  if (currentMillis - previousMillis >= interval) {
-    // save the last time you blinked the LED
-    previousMillis = currentMillis;
-
-    // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW) {
-      ledState = HIGH;
-    } else {
-      ledState = LOW;
-    }
-
-    // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
+  myMotor->run(FORWARD);
+  for (i=0; i<255; i++) {
+    myMotor->setSpeed(i);
+    delay(10);
   }
+  for (i=255; i!=0; i--) {
+    myMotor->setSpeed(i);
+    delay(10);
+  }
+
+  Serial.print("tock");
+
+  myMotor->run(BACKWARD);
+  for (i=0; i<255; i++) {
+    myMotor->setSpeed(i);
+    delay(10);
+  }
+  for (i=255; i!=0; i--) {
+    myMotor->setSpeed(i);
+    delay(10);
+  }
+
+  Serial.print("tech");
+  myMotor->run(RELEASE);
+  delay(1000);
 }
