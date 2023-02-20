@@ -10,6 +10,20 @@ Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
 Adafruit_DCMotor *motor3 = AFMS.getMotor(3);
 Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
 
+// Pins initalised
+const int followPin1 = xx; //Left
+const int followPin2 = xx; //Centre
+const int followPin3 = xx; //Right
+
+pinMode(followPin1, INPUT);
+pinMode(followPin2, INPUT);
+pinMode(followPin3, INPUT);
+
+// Variables initialised
+bool followLeftV = 1;
+bool followCentreV = 1;
+bool followRightV = 1;
+
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -33,5 +47,12 @@ void setup() {
 }
 
 void loop() {
-  
+  followLeftV = digitalRead(followPin1);
+  followCentreV = digitalRead(followPin2);
+  followRightV = digitalRead(followPin3);
+
+  while(1):
+    serial.println("Pin readings: %d", followLeftV);
+    delay(50);
+
 }
