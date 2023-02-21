@@ -15,8 +15,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
 
 // Select which 'port' M1, M2, M3 or M4. In this case, M1
-Adafruit_DCMotor *myMotor3 = AFMS.getMotor(3);
-Adafruit_DCMotor *myMotor4 = AFMS.getMotor(4);
+Adafruit_DCMotor *myMotor3 = AFMS.getMotor(1);
+Adafruit_DCMotor *myMotor4 = AFMS.getMotor(2);
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -29,45 +29,22 @@ void setup() {
   }
   Serial.println("Motor Shield found.");
 
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor3->setSpeed(150);
-  myMotor3->run(FORWARD);
-
-  myMotor4->setSpeed(150);
-  myMotor4->run(FORWARD);
-  // turn on motor
-  myMotor3->run(RELEASE);
-  myMotor4->run(RELEASE);
 }
 
 void loop() {
   uint8_t i;
 
+    // Set the speed to start, from 0 (off) to 255 (max speed)
+  myMotor3->setSpeed(150);
+  myMotor3->run(FORWARD);
+
+  myMotor4->setSpeed(150);
+  myMotor4->run(FORWARD);
+
   Serial.print("tick");
-
-  myMotor->run(FORWARD);
-  for (i=0; i<255; i++) {
-    myMotor->setSpeed(i);
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    myMotor->setSpeed(i);
-    delay(10);
-  }
-
-  Serial.print("tock");
-
-  myMotor->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    myMotor->setSpeed(i);
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    myMotor->setSpeed(i);
-    delay(10);
-  }
-
   Serial.print("tech");
-  myMotor->run(RELEASE);
+  
+  myMotor3->run(RELEASE);
+  myMotor4->run(RELEASE);
   delay(1000);
 }
