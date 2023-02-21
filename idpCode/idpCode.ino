@@ -55,17 +55,12 @@ void loop() {
 
   // obtain digital reading from each pin
   while(1) {
-    followLeftV = digitalRead(followPin1);
-    Serial.println("left sensor: "+followLeftV);
-    delay(100);
+    takeLineReadings();
 
-    followCentreV = digitalRead(followPin2);
-    Serial.println("central sensor: "+followCentreV);
-    delay(100);
-
-    followRightV = digitalRead(followPin3);
-    Serial.println("right sensor: "+followRightV);
-    delay(100);
+    switch (status) {
+      case "find new block":
+        findNewBlock();
+    }
   }
 
   if (followleftV==0 && followCentreV==1 && followRightV==0) {
@@ -79,6 +74,21 @@ void loop() {
   // would have more for other situations
 }
 
+// Define functions
+
+void takeLineReadings() {
+  followLeftV = digitalRead(followPin1);
+  Serial.println("left sensor: "+followLeftV);
+  delay(100);
+
+  followCentreV = digitalRead(followPin2);
+  Serial.println("central sensor: "+followCentreV);
+  delay(100);
+
+  followRightV = digitalRead(followPin3);
+  Serial.println("right sensor: "+followRightV);
+  delay(100);
+}
 
 void moveForward() {
 
@@ -94,4 +104,8 @@ void turnRight() {
 
 void stopMoving() {
 
+}
+
+void lineFollow() {
+  
 }
