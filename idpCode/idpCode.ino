@@ -17,7 +17,6 @@ const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
 
 
-
 // Variables initialised
 int followPins[4];
 
@@ -74,31 +73,28 @@ void turn(char dir) {
     case 'F':
       // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
       Serial.println("Go forward");
-      motor3->setSpeed(150);
-      motor4->setSpeed(150);
+
       break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-      motor3->setSpeed(140);  
-      motor4->setSpeed(150); 
+
       break;
 
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-      motor3->setSpeed(150)  
-      motor4->setSpeed(140)
+
       break;
   }
 
 }
 
 
-void lineFollow() {
+/* void lineFollow() {
   if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
     turn('F'); //move forward
   }
@@ -108,7 +104,19 @@ void lineFollow() {
   else if (!followPins[1] && followPins[2]) { //if RC sensor on
     turn('R'); // turn right
   }
+} */
+
+void lineFollowPID(){
+  
 }
+
+
+int set_motors(int mot3speed, int mot4speed)
+{   motor3->setSpeed(mot3speed);
+    motor4->setSpeed(mot4speed);
+}
+
+
 
 void loop() {
 
