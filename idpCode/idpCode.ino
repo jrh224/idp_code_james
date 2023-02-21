@@ -11,16 +11,15 @@ Adafruit_DCMotor *motor3 = AFMS.getMotor(3);
 Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
 
 // Pins initalised
-const int followPin1 = 9; //Left
-const int followPin2 = 10; //Centre
-const int followPin3 = 11; //Right
+const int followPin1 = 9; //LL
+const int followPin2 = 10; //LC
+const int followPin3 = 11; //RC
+const int followPin4 = 12; //RR
 
 
 
 // Variables initialised
-int followLeftV = 1;
-int followCentreV = 1;
-int followRightV = 1;
+int followPins = {0,0,0,0};
 
 // defining speed of robot
 int speed = 100;
@@ -29,9 +28,10 @@ int speed = 100;
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("IDP");
-  pinMode(followPin1, INPUT);
+  pinMode(followPin1, INPUT); //Set all four line follower pins as inputs
   pinMode(followPin2, INPUT);
   pinMode(followPin3, INPUT);
+  pinMode(followPin4, INPUT);
 
 // Check that motor shield has been found
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
@@ -41,8 +41,8 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  motor3->setSpeed(150);
-  motor4->setSpeed(150);
+  motor3->setSpeed(speed);
+  motor4->setSpeed(speed);
   // turn off motors
   motor1->run(RELEASE);
   motor2->run(RELEASE);
@@ -55,17 +55,12 @@ void loop() {
 
   // obtain digital reading from each pin
   while(1) {
-    followLeftV = digitalRead(followPin1);
-    Serial.println("left sensor: "+followLeftV);
-    delay(100);
+    takeLineReadings();
 
-    followCentreV = digitalRead(followPin2);
-    Serial.println("central sensor: "+followCentreV);
-    delay(100);
-
-    followRightV = digitalRead(followPin3);
-    Serial.println("right sensor: "+followRightV);
-    delay(100);
+    switch (status) {
+      case "find new block":
+        findNewBlock();
+    }
   }
 
   if (followleftV==0 && followCentreV==1 && followRightV==0) {
@@ -79,19 +74,49 @@ void loop() {
   // would have more for other situations
 }
 
+// Define functions
+
+void takeLineReadings() {
+  followPins[0] = digitalRead(followPin1);
+  followPins[1] = digitalRead(followPin2);
+  followPins[2] = digitalRead(followPin3);
+  followPins[3] = digitalRead(followPin4);
+
+  Serial.println(followPins);
+}
 
 void moveForward() {
+<<<<<<< HEAD
     
+=======
+  Serial.println("Moving forward");
+}
+
+void moveBackward() {
+
+>>>>>>> d0b4116149f0fe7ce69f96198e8c404e5a5171bc
 }
 
 void turnLeft() {
-
+  Serial.println("Moving left");
 }
 
 void turnRight() {
-
+  Serial.println("Moving right");
 }
 
 void stopMoving() {
 
+}
+
+void lineFollow() {
+  if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
+    moveForward();
+  }
+  else if (followPins[1] && !followPins[2]) {
+    turnLeft();
+  }
+  else if (!followPins[1] && followPins[2]) {
+    turnRight();
+  }
 }
