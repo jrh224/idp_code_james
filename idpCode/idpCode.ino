@@ -19,10 +19,7 @@ const int followPin4 = 12; //RR
 
 
 // Variables initialised
-int followLL = 1;
-int followLC = 1;
-int followRC = 1;
-int followRR = 1;
+int followPins = {0,0,0,0};
 
 // defining speed of robot
 int speed = 100;
@@ -44,8 +41,8 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  motor3->setSpeed(150);
-  motor4->setSpeed(150);
+  motor3->setSpeed(speed);
+  motor4->setSpeed(speed);
   // turn off motors
   motor1->run(RELEASE);
   motor2->run(RELEASE);
@@ -80,33 +77,28 @@ void loop() {
 // Define functions
 
 void takeLineReadings() {
-  followLL = digitalRead(followPin1);
-  Serial.println("left sensor: "+followLL);
-  delay(100);
+  followPins[0] = digitalRead(followPin1);
+  followPins[1] = digitalRead(followPin2);
+  followPins[2] = digitalRead(followPin3);
+  followPins[3] = digitalRead(followPin4);
 
-  followLC = digitalRead(followPin2);
-  Serial.println("central sensor: "+followLC);
-  delay(100);
-
-  followRC = digitalRead(followPin3);
-  Serial.println("right sensor: "+followRC);
-  delay(100);
-
-  followRR = digitalRead(followPin4);
-  Serial.println("right sensor: "+followRR);
-  delay(100);
+  Serial.println(followPins);
 }
 
 void moveForward() {
+  Serial.println("Moving forward");
+}
+
+void moveBackward() {
 
 }
 
 void turnLeft() {
-
+  Serial.println("Moving left");
 }
 
 void turnRight() {
-
+  Serial.println("Moving right");
 }
 
 void stopMoving() {
@@ -114,5 +106,13 @@ void stopMoving() {
 }
 
 void lineFollow() {
-  
+  if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
+    moveForward();
+  }
+  else if (followPins[1] && !followPins[2]) {
+    turnLeft();
+  }
+  else if (!followPins[1] && followPins[2]) {
+    turnRight();
+  }
 }
