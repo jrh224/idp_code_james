@@ -50,10 +50,63 @@ void setup() {
   motor4->run(RELEASE);
 }
 
+
+//Define functions
+
+// Define functions
+
+void takeLineReadings() {
+  followPins[0] = digitalRead(followPin1);
+  followPins[1] = digitalRead(followPin2);
+  followPins[2] = digitalRead(followPin3);
+  followPins[3] = digitalRead(followPin4);
+
+  for (int i = 0; i < 4; i++) {
+    Serial.print(followPins[i]);
+  }
+  Serial.println();
+}
+
+void turn(char dir) {
+
+  switch(dir) {
+
+    case 'F':
+      // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
+      Serial.println("Go forward");
+      break;
+
+    case 'L':
+      // SET MOTORS TO TURN LEFT IF NOT ALREADY
+      Serial.println("Turn left");
+      break;
+
+    case 'R':
+      // SET MOTORS TO TURN RIGHT IF NOT ALREADY
+      Serial.println("Turn right");
+      break;
+  }
+
+}
+
+
+void lineFollow() {
+  if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
+    turn('F'); //move forward
+  }
+  else if (followPins[1] && !followPins[2]) { //if LC sensor on
+    turn('L'); // turn left
+  }
+  else if (!followPins[1] && followPins[2]) { //if RC sensor on
+    turn('R'); // turn right
+  }
+}
+
 void loop() {
 
-    // takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    // lineFollow();
+    takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    lineFollow();
+    delay(500);
 
     // if (start sequence) {
     //   turn(F); // move forwards
@@ -75,46 +128,3 @@ void loop() {
 
 }
 
-// Define functions
-
-void takeLineReadings() {
-  followPins[0] = digitalRead(followPin1);
-  followPins[1] = digitalRead(followPin2);
-  followPins[2] = digitalRead(followPin3);
-  followPins[3] = digitalRead(followPin4);
-
-  Serial.println(followPins);
-}
-
-void turn(dir) {
-
-  switch(dir) {
-
-    case 'F':
-      // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
-
-    case 'L':
-
-      // SET MOTORS TO TURN LEFT IF NOT ALREADY
-      break;
-
-    case 'R':
-
-      // SET MOTORS TO TURN RIGHT IF NOT ALREADY
-      break;
-  }
-
-}
-
-
-void lineFollow() {
-  if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
-    turn('F'); //move forward
-  }
-  else if (followPins[1] && !followPins[2]) { //if LC sensor on
-    turn('L'); // turn left
-  }
-  else if (!followPins[1] && followPins[2]) { //if RC sensor on
-    turn('R'); // turn right
-  }
-}
