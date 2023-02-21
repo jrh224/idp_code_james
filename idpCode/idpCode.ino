@@ -74,16 +74,24 @@ void turn(char dir) {
     case 'F':
       // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
       Serial.println("Go forward");
+      motor3->setSpeed(150);
+      motor4->setSpeed(150);
       break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
+      // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
+      motor3->setSpeed(140);  
+      motor4->setSpeed(150); 
       break;
 
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
+      // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
+      motor3->setSpeed(150)  
+      motor4->setSpeed(140)
       break;
   }
 
