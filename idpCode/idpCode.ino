@@ -11,15 +11,15 @@ Adafruit_DCMotor *motor3 = AFMS.getMotor(3);
 Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
 
 // Pins initalised
-const int followPin1 = 9; //LL
-const int followPin2 = 10; //LC
-const int followPin3 = 11; //RC
-const int followPin4 = 12; //RR
+const int followPin1 = 8; //LL
+const int followPin2 = 9; //LC
+const int followPin3 = 10; //RC
+const int followPin4 = 11; //RR
 
 
 
 // Variables initialised
-int followPins = {0,0,0,0};
+int followPins[4];
 
 // defining speed of robot
 int speed = 100;
@@ -52,26 +52,27 @@ void setup() {
 
 void loop() {
 
+    // takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    // lineFollow();
 
-  // obtain digital reading from each pin
-  while(1) {
-    takeLineReadings();
+    // if (start sequence) {
+    //   turn(F); // move forwards
+    //   if (start box boundary detected) {
+    //     // note that box boundary has been found
+    //     // wait for a robot to move past the line -- e.g. maybe use ticker, or add a count to the loop?
+    //     // then begin line following junction, and set 'currently looking for cross junction' to true
+    //   }
+    // }
+    // if (T junction on RHS detected && currently looking for RHS turn cross junction) { //e.g. looking for box pick up spot, or box drop off spot
 
-    switch (status) {
-      case "find new block":
-        findNewBlock();
-    }
-  }
+    // }
+    // if (T junction on LHS detected && currently looking for LHS turn cross junction) { //e.g just out start box,
 
-  if (followleftV==0 && followCentreV==1 && followRightV==0) {
-    moveForward;
-    Serial.println("moving forward");
-    delay(100);
-  }
-  
-  ///else if (followleftV==1 && followCentreV==0 && followRightV==0) {turnLeft;}
-  // else if (followleftV==0 && followCentreV==0 && followRightV==1) {turnRight;}
-  // would have more for other situations
+    // }
+    // if (right hand side T junction detected && currently looking for RHS junction) { //e.g. 
+
+    // }
+
 }
 
 // Define functions
@@ -85,48 +86,35 @@ void takeLineReadings() {
   Serial.println(followPins);
 }
 
-void moveForward() {
-    
-  Serial.println("Moving forward");
-}
-
-void moveBackward() {
-
-}
-
 void turn(dir) {
 
   switch(dir) {
 
     case 'F':
-      // SET MOTORS TO DRIVE FORWARDS
+      // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
 
     case 'L':
 
-      // SET MOTORS TO TURN LEFT
+      // SET MOTORS TO TURN LEFT IF NOT ALREADY
       break;
 
     case 'R':
 
-      // SET MOTORS TO TURN RIGHT
+      // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       break;
   }
 
 }
 
 
-void stopMoving() {
-
-}
-
 void lineFollow() {
   if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
-    turn('F');
+    turn('F'); //move forward
   }
-  else if (followPins[1] && !followPins[2]) {
-    turn('L');
+  else if (followPins[1] && !followPins[2]) { //if LC sensor on
+    turn('L'); // turn left
   }
-  else if (!followPins[1] && followPins[2]) {
-    turn('R');
+  else if (!followPins[1] && followPins[2]) { //if RC sensor on
+    turn('R'); // turn right
   }
 }
