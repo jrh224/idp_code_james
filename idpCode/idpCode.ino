@@ -86,15 +86,12 @@ void takeLineReadings() {
 }
 
 void moveForward() {
-<<<<<<< HEAD
     
-=======
   Serial.println("Moving forward");
 }
 
 void moveBackward() {
 
->>>>>>> d0b4116149f0fe7ce69f96198e8c404e5a5171bc
 }
 
 void turnLeft() {
