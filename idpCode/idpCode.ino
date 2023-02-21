@@ -80,7 +80,7 @@ void turn(char dir) {
       Serial.println("Go forward");
       leftMotorSpeed = speed;
       rightMotorSpeed = speed;
-      set_motors(100,100)
+      set_motors(leftMotorSpeed,rightMotorSpeed)
       break;
 
     case 'L':
