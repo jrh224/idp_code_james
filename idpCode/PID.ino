@@ -46,9 +46,10 @@ void PID()     // PID function definition
     int derivative,proportional;
     while(1) 
 
-
     takeLineReadings();
-    position = followPins;            //reading the sensor value and position is a list of digital readings
+    position = (3000*followPins[0] + 2000*followPins[1] + 1000*followPins[2] + 0*followPins[3])/(followPins[0] + followPins[1] + followPins[2] + followPins[3]);
+                // reading the sensor value and position is is a weighted average of where the 
+                // line is relative to the sensors
 
 
      //replace value 2000 with your position by placing your robot at the dead centre and read the value
@@ -101,11 +102,11 @@ void PID()     // PID function definition
 
       readline();
 
-      if(a[0] == LOW && a[1] == LOW && a[2] == LOW && a[3] == LOW && a[4] == LOW)
+      if(followPins[0] == LOW && followPins[1] == LOW && followPins[2] == LOW && followPins[3] == LOW && followPins[4] == LOW)
 
       return;
 
-      else if(a[0]== HIGH || a[4] == HIGH)
+      else if(followPins[0]== HIGH || followPins[4] == HIGH)
 
       return;
 
