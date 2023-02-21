@@ -42,9 +42,8 @@ void loop() {
   myMotor4->run(FORWARD);
 
   Serial.print("tick");
+
   Serial.print("tech");
-  
-  myMotor3->run(RELEASE);
-  myMotor4->run(RELEASE);
+  //myMotor3->run(RELEASE);
   delay(1000);
 }
