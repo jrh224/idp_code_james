@@ -23,6 +23,12 @@ int followPins[4];
 // defining speed of robot
 int speed = 100;
 
+// function to set motor speeds
+int set_motors(int mot3speed, int mot4speed)
+{   motor3->setSpeed(mot3speed);
+    motor4->setSpeed(mot4speed);
+}
+
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -40,8 +46,8 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  motor3->setSpeed(speed);
-  motor4->setSpeed(speed);
+  set_motors(speed, speed);
+
   // turn off motors
   motor1->run(RELEASE);
   motor2->run(RELEASE);
@@ -49,8 +55,6 @@ void setup() {
   motor4->run(RELEASE);
 }
 
-
-//Define functions
 
 // Define functions
 
@@ -68,33 +72,40 @@ void takeLineReadings() {
 
 void turn(char dir) {
 
+  int leftMotorSpeed, rightMotorSpeed;
   switch(dir) {
 
     case 'F':
       // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
       Serial.println("Go forward");
-
+      leftMotorSpeed = speed;
+      rightMotorSpeed = speed;
+      set_motors(100,100)
       break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-
+      leftMotorSpeed = leftMotorSpeed – 5;
+      rightMotorSpeed = rightMotorSpeed + 5;
+      set_motors(leftMotorSpeed, rightMotorSpeed)
       break;
 
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-
+      leftMotorSpeed = leftMotorSpeed + 5;
+      rightMotorSpeed = rightMotorSpeed - 5;
+      set_motors(leftMotorSpeed, rightMotorSpeed)
       break;
   }
 
 }
 
 
-/* void lineFollow() {
+void lineFollow() {
   if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
     turn('F'); //move forward
   }
@@ -104,17 +115,67 @@ void turn(char dir) {
   else if (!followPins[1] && followPins[2]) { //if RC sensor on
     turn('R'); // turn right
   }
-} */
+}
+
 
 void lineFollowPID(){
   
-}
+  for (int i = 0; i < 4; i++) {
+    int sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
+    int sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
+  }
+  int position = int(sensors_average/sensors_sum);
+
+  float Kp, Ki, Kd;
+  // value of kp ki kd is found by testing
+  Kp = 1.0;
+  Ki = 1.0;
+  Kd = 1.0;
+
+  /*
+  // only really need to run the below when finding the set point ,Kp, Ki ,Kd
+  Serial.print(sensors_average);
+  Serial.print(' '); 
+  Serial.print(sensors_sum); 
+  Serial.print(' '); 
+  Serial.print(position); 
+  Serial.println(); 
+  delay(2000); */
+
+  int leftMotorSpeed, rightMotorSpeed;
+  int error; // set this starting to 0 in main loop
+  int P_past; // set this starting to 0 in main loop
+  int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from above) is the set point
+
+  int P = position – set_point;
+  int I = I + P;
+  int D = P - P_past;
+  P_past = P;
+
+  error = P*Kp + I*Ki + D*Kd;
+  // restricting error value between ±50 --> can change this value to fit
+  if (error<-50) {error=-50;}
+  if (error>50) {error=50;}
 
 
-int set_motors(int mot3speed, int mot4speed)
-{   motor3->setSpeed(mot3speed);
-    motor4->setSpeed(mot4speed);
+  // If error is less than zero then calc right turn speed values
+  if (error<0)
+    {
+    rightMotorSpeed = speed - error; 
+    leftMotorSpeed = speed;
+    set_motors(leftMotorSpeed, rightMotorSpeed)
+    }
+
+  // If error is greater than zero calc left turn values
+  else
+    {
+    rightMotorSpeed = speed;
+    leftMotorSpeed = speed + error;
+    set_motors(leftMotorSpeed, rightMotorSpeed)
+    } 
+  
 }
+
 
 
 
