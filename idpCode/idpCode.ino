@@ -85,25 +85,31 @@ void takeLineReadings() {
   Serial.println(followPins);
 }
 
-void moveForward() {
-<<<<<<< HEAD
-    
-=======
-  Serial.println("Moving forward");
-}
 
 void moveBackward() {
 
->>>>>>> d0b4116149f0fe7ce69f96198e8c404e5a5171bc
 }
 
-void turnLeft() {
-  Serial.println("Moving left");
+void turn(dir) {
+
+  switch(dir) {
+
+    case 'F':
+      // SET MOTORS TO DRIVE FORWARDS
+
+    case 'L':
+
+      // SET MOTORS TO TURN LEFT
+      break;
+
+    case 'R':
+
+      // SET MOTORS TO TURN RIGHT
+      break;
+  }
+
 }
 
-void turnRight() {
-  Serial.println("Moving right");
-}
 
 void stopMoving() {
 
@@ -111,12 +117,12 @@ void stopMoving() {
 
 void lineFollow() {
   if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
-    moveForward();
+    turn('F');
   }
   else if (followPins[1] && !followPins[2]) {
-    turnLeft();
+    turn('L');
   }
   else if (!followPins[1] && followPins[2]) {
-    turnRight();
+    turn('R');
   }
 }
