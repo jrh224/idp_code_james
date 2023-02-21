@@ -15,9 +15,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
 
 // Select which 'port' M1, M2, M3 or M4. In this case, M1
-Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
-// You can also make another motor on port M2
-//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *myMotor3 = AFMS.getMotor(3);
+Adafruit_DCMotor *myMotor4 = AFMS.getMotor(4);
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -31,10 +30,14 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor->setSpeed(150);
-  myMotor->run(FORWARD);
+  myMotor3->setSpeed(150);
+  myMotor3->run(FORWARD);
+
+  myMotor4->setSpeed(150);
+  myMotor4->run(FORWARD);
   // turn on motor
-  myMotor->run(RELEASE);
+  myMotor3->run(RELEASE);
+  myMotor4->run(RELEASE);
 }
 
 void loop() {
