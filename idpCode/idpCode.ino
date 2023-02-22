@@ -5,10 +5,10 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Initialise the 4 motors (1 and 2 are fast, 3 and 4 are slow)
-Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
-Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
-Adafruit_DCMotor *motor3 = AFMS.getMotor(3);
-Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
+//Adafruit_DCMotor *motor1 = AFMS.getMotor(1);
+//Adafruit_DCMotor *motor2 = AFMS.getMotor(2);
+Adafruit_DCMotor *motor3 = AFMS.getMotor(1);
+Adafruit_DCMotor *motor4 = AFMS.getMotor(2);
 
 // Pins initalised
 const int followPin1 = 8; //LL
@@ -31,11 +31,15 @@ char nextTurn = 'L';
 
 // defining speed of robot
 int speed = 100;
+int leftMotorSpeed = speed;
+int rightMotorSpeed = speed;
 
 // function to set motor speeds
-int set_motors(int mot3speed, int mot4speed)
+void set_motors(int mot3speed, int mot4speed)
 {   motor3->setSpeed(mot3speed);
+    motor3->run(FORWARD);
     motor4->setSpeed(mot4speed);
+    motor4->run(FORWARD);
 }
 
 
@@ -59,10 +63,10 @@ void setup() {
   set_motors(speed, speed);
 
   // turn off motors
-  motor1->run(RELEASE);
-  motor2->run(RELEASE);
-  motor3->run(RELEASE);
-  motor4->run(RELEASE);
+  //motor1->run(RELEASE);
+  //motor2->run(RELEASE);
+  //motor3->run(RELEASE);
+  //motor4->run(RELEASE);
 }
 
 
@@ -81,8 +85,6 @@ void takeLineReadings() {
 }
 
 void turn(char dir) {
-
-  int leftMotorSpeed, rightMotorSpeed;
   switch(dir) {
 
     case 'F':
@@ -90,16 +92,16 @@ void turn(char dir) {
       Serial.println("Go forward");
       leftMotorSpeed = speed;
       rightMotorSpeed = speed;
-      set_motors(leftMotorSpeed,rightMotorSpeed)
+      set_motors(leftMotorSpeed,rightMotorSpeed);
       break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-      leftMotorSpeed = leftMotorSpeed – 5;
+      leftMotorSpeed = leftMotorSpeed - 5;
       rightMotorSpeed = rightMotorSpeed + 5;
-      set_motors(leftMotorSpeed, rightMotorSpeed)
+      set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
 
     case 'R':
@@ -108,10 +110,10 @@ void turn(char dir) {
       Serial.println("Turn right");
       leftMotorSpeed = leftMotorSpeed + 5;
       rightMotorSpeed = rightMotorSpeed - 5;
-      set_motors(leftMotorSpeed, rightMotorSpeed)
+      set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
 
-    case 'CW':
+    case 'C':
       // SET MOTORS TO ROTATE CLOCKWISE
       Serial.println("Rotate clockwise");
       /*       
@@ -121,9 +123,10 @@ void turn(char dir) {
       set_motors(leftMotorSpeed, rightMotorSpeed) */
       break;
     
-    case 'ACW':
+    case 'A':
     // SET MOTORS TO ROTATE ANTICLOCKWISE
       Serial.println("Rotate anticlockwise");
+      break;
   }
 
 }
@@ -218,7 +221,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 void moveOutStartBox(){
   numJunctions = 1;
   nextTurn = 'L';
-  turn("F"); // robot moves forward
+  turn('F'); // robot moves forward
 // numJunctions--; //robot acknowledges edge of box as one junction --> numJunction = 0 now
 // at next Junction, robo turns left
 // by the end of this function, the robot must have turned left and started line following
@@ -242,14 +245,14 @@ void dropOffCube(){
 }
 
 
-void blueBoxDetected(){
+int blueBoxDetected(){
     Serial.println("Blue box detected.");
     // must count 1 junction to reach the desired drop off spot
     numJunctions = 0; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
     return numJunctions;
 }
 
-void brownBoxDetected() {
+int brownBoxDetected() {
     Serial.println("Brown box detected.");
     // must count 3 junctions to reach the desired drop off spot
     numJunctions = 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
@@ -263,9 +266,9 @@ void detectColour(){
 }
 
 void loop() {
-    detectColour();
-    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    //lineFollow();
+    //detectColour();
+    takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    lineFollow();
     //junctionDetect();
     delay(500);
 
