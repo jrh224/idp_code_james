@@ -119,7 +119,7 @@ void lineFollow() {
 
 
 void lineFollowPID(){
-  
+  // must do takeLineReadings() before this function
   for (int i = 0; i < 4; i++) {
     int sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
     int sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
@@ -181,7 +181,7 @@ void moveOutStartBox(){
 
 }
 
-void skipJunction(){
+void collectBox(){
 
 }
 
