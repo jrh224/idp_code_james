@@ -109,7 +109,7 @@ void turn(char dir) {
       set_motors(leftMotorSpeed, rightMotorSpeed) */
       break;
 
-    case 'C':
+    case 'CW':
       // SET MOTORS TO ROTATE CLOCKWISE
       Serial.println("Rotate clockwise");
       /*       
@@ -117,6 +117,11 @@ void turn(char dir) {
       // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = rightMotorSpeed - 20;
       set_motors(leftMotorSpeed, rightMotorSpeed) */
+      break;
+    
+    case 'ACW':
+    // SET MOTORS TO ROTATE ANTICLOCKWISE
+      Serial.println("Rotate anticlockwise");
   }
 
 }
