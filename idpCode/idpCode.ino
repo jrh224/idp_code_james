@@ -149,7 +149,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 }
 
 
-void lineFollowPID(){
+/* void lineFollowPID(){
   // must do takeLineReadings() before this function
   for (int i = 0; i < 4; i++) {
     int sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
@@ -162,7 +162,7 @@ void lineFollowPID(){
   Kp = 1.0;
   Ki = 1.0;
   Kd = 1.0;
-
+ */
   /*
   // only really need to run the below when finding the set point ,Kp, Ki ,Kd
   Serial.print(sensors_average);
@@ -173,7 +173,7 @@ void lineFollowPID(){
   Serial.println(); 
   delay(2000); */
 
-  int leftMotorSpeed, rightMotorSpeed;
+/*   int leftMotorSpeed, rightMotorSpeed;
   int error; // set this starting to 0 in main loop
   int P_past; // set this starting to 0 in main loop
   int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from above) is the set point
@@ -205,7 +205,7 @@ void lineFollowPID(){
     set_motors(leftMotorSpeed, rightMotorSpeed)
     } 
   
-}
+} */
 
 
 void moveOutStartBox(){
