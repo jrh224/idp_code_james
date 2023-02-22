@@ -15,10 +15,12 @@ const int followPin1 = 8; //LL
 const int followPin2 = 9; //LC
 const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
-
+const int detectColourPin = 7; 
 
 // Variables initialised
 int followPins[4];
+int numJunctions = 1; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int detection; // value for colour detected
 
 // defining speed of robot
 int speed = 100;
@@ -37,6 +39,7 @@ void setup() {
   pinMode(followPin2, INPUT);
   pinMode(followPin3, INPUT);
   pinMode(followPin4, INPUT);
+  pinMode(detectColourPin, INPUT); // set colout detector pin as input
 
 // Check that motor shield has been found
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
@@ -179,14 +182,41 @@ void lineFollowPID(){
 
 void moveOutStartBox(){
 
+// by the end of this function, the robot must have turned left and started line following
 }
 
-void collectBox(){
+void collectCube(){
 
+// by the end of this function, the robot must be line following again
 }
 
-void followJunction(){
+void dropOffCube(){
+// robot goes into box
+// robot reverses and keeps rotating until found white line
+// by the end of this function, the robot must be line following again
+// numJunctions = 0 if dropped off a blue box
+// numJunctions = 2 if dropped off a brown box
+}
 
+
+void blueBoxDetected(){
+    Serial.println("Blue box detected.");
+    // must count 1 junction to reach the desired drop off spot
+    numJunctions = 0; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+    return numJunctions;
+}
+
+void brownBoxDetected() {
+    Serial.println("Brown box detected.");
+    // must count 3 junctions to reach the desired drop off spot
+    numJunctions = 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+    return numJunctions;
+}
+
+void detectColour(){
+  int detection = digitalRead(detectColourPin);
+  if (detection) {blueBoxDetected();}
+  else {brownBoxDetected();}
 }
 
 void loop() {
