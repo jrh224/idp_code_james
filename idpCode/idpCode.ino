@@ -145,7 +145,7 @@ void lineFollow() {
 }
 
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
-  if (followPins[0] || followPins[3]) {
+  if (followPins[0]&&followPins[1] || followPins[3]&&followPins[2]) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
@@ -156,8 +156,12 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     currentJunctReadings -= 3;
     }
   }
+  else if ((followPins[0] && !followPins[1]) || (followPins[3] && !followPins[2]))
+  {Serial.println("Strayed from line. Line following no longer correct.");}
+  // need to add code for when just LL or just RR detects a line bc this might be an error
 }
-
+// line 160 need to add error correction code for when just LL or just RR detects a line bc this 
+// indicates that line is no longer at centre of robot
 
 /* void lineFollowPID(){
   // must do takeLineReadings() before this function
