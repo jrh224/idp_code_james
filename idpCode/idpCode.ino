@@ -109,9 +109,9 @@ void turn(char dir) {
       set_motors(leftMotorSpeed, rightMotorSpeed) */
       break;
 
-    case 'C';
+    case 'C':
       // SET MOTORS TO ROTATE CLOCKWISE
-      Serial.println("Rotate clockwise")
+      Serial.println("Rotate clockwise");
       /*       
       leftMotorSpeed = leftMotorSpeed + 20;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
@@ -140,7 +140,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
       numJunctions --;
-      Serial.println("Junction detected!")
+      Serial.println("Junction detected!");
     }
     else if (currentJunctReadings > 0) {
     currentJunctReadings -= 2;
