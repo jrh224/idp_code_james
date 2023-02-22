@@ -177,7 +177,17 @@ void lineFollowPID(){
 }
 
 
+void moveOutStartBox(){
 
+}
+
+void skipJunction(){
+
+}
+
+void followJunction(){
+
+}
 
 void loop() {
 
