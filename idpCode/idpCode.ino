@@ -209,7 +209,8 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 
 void moveOutStartBox(){
-// robot moves forward
+  numJunctions = 1;
+  turn("F"); // robot moves forward
 // numJunctions--; //robot acknowledges edge of box as one junction --> numJunction = 0 now
 // at next Junction, robo turns left
 // by the end of this function, the robot must have turned left and started line following
