@@ -26,6 +26,8 @@ int detection; // value for colour detected
 int requiredJunctReadings = 5;
 // define current number of junction readings
 int currentJunctReadings = 0;
+// define next turn direction
+char nextTurn = 'L';
 
 // defining speed of robot
 int speed = 100;
@@ -215,6 +217,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 void moveOutStartBox(){
   numJunctions = 1;
+  nextTurn = 'L';
   turn("F"); // robot moves forward
 // numJunctions--; //robot acknowledges edge of box as one junction --> numJunction = 0 now
 // at next Junction, robo turns left
@@ -265,6 +268,16 @@ void loop() {
     lineFollow();
     junctionDetect();
     delay(500);
+
+    /*
+    if (start sequence):
+      moveOutStartBox();
+      start sequence = false;
+
+    if (numJunctions < 0):
+      90degreeturn(nextTurn); [then go back to line following]
+    */
+
 
     // if (start sequence) {
     //   turn(F); // move forwards
