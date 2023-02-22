@@ -109,7 +109,8 @@ void turn(char dir) {
       // SET MOTORS TO ROTATE CLOCKWISE
       Serial.println("Rotate clockwise")
       /*       
-      leftMotorSpeed = leftMotorSpeed + 20;  // may need to change these values ±20 might not work 
+      leftMotorSpeed = leftMotorSpeed + 20;  // may need to change these values according to distance between wheels
+      // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = rightMotorSpeed - 20;
       set_motors(leftMotorSpeed, rightMotorSpeed) */
   }
