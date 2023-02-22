@@ -22,6 +22,10 @@ int followPins[4];
 int numJunctions = 1; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
+// define number of readings in the last 5 for a junction before action is taken
+int requiredJunctReadings = 5;
+// define current number of junction readings
+int currentJunctReadings = 0;
 
 // defining speed of robot
 int speed = 100;
@@ -127,6 +131,20 @@ void lineFollow() {
   }
   else if (!followPins[1] && followPins[2]) { //if RC sensor on
     turn('R'); // turn right
+  }
+}
+
+void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
+  if (followPins[0] || followPins[3]) {
+    currentJunctReadings += 10;
+    if (currentJunctReadings > (requiredJunctReadings*10)) {
+      currentJunctReadings = 0;
+      numJunctions --;
+      Serial.println("Junction detected!")
+    }
+    else if (currentJunctReadings > 0) {
+    currentJunctReadings -= 2;
+    }
   }
 }
 
@@ -239,6 +257,7 @@ void loop() {
 
     takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
     lineFollow();
+    junctionDetect();
     delay(500);
 
     // if (start sequence) {
