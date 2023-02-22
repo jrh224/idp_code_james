@@ -163,6 +163,8 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
 
+
+
 /* void lineFollowPID(){
   // must do takeLineReadings() before this function
   for (int i = 0; i < 4; i++) {
