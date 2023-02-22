@@ -88,27 +88,27 @@ void turn(char dir) {
     case 'F':
       // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
       Serial.println("Go forward");
-/*       leftMotorSpeed = speed;
+      leftMotorSpeed = speed;
       rightMotorSpeed = speed;
-      set_motors(leftMotorSpeed,rightMotorSpeed) */
+      set_motors(leftMotorSpeed,rightMotorSpeed)
       break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-/*       leftMotorSpeed = leftMotorSpeed – 5;
+      leftMotorSpeed = leftMotorSpeed – 5;
       rightMotorSpeed = rightMotorSpeed + 5;
-      set_motors(leftMotorSpeed, rightMotorSpeed) */
+      set_motors(leftMotorSpeed, rightMotorSpeed)
       break;
 
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-/*       leftMotorSpeed = leftMotorSpeed + 5;
+      leftMotorSpeed = leftMotorSpeed + 5;
       rightMotorSpeed = rightMotorSpeed - 5;
-      set_motors(leftMotorSpeed, rightMotorSpeed) */
+      set_motors(leftMotorSpeed, rightMotorSpeed)
       break;
 
     case 'CW':
@@ -263,10 +263,10 @@ void detectColour(){
 }
 
 void loop() {
-
-    takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollow();
-    junctionDetect();
+    detectColour();
+    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    //lineFollow();
+    //junctionDetect();
     delay(500);
 
     /*
