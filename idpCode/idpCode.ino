@@ -194,7 +194,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
   int P_past; // set this starting to 0 in main loop
   int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from above) is the set point
 
-  int P = position – set_point;
+  int P = position – set_point; // use modulus of this value!!!
   int I = I + P;
   int D = P - P_past;
   P_past = P;
