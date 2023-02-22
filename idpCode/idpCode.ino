@@ -143,7 +143,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
       Serial.println("Junction detected!");
     }
     else if (currentJunctReadings > 0) {
-    currentJunctReadings -= 2;
+    currentJunctReadings -= 3;
     }
   }
 }
