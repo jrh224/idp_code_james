@@ -32,17 +32,15 @@ char nextTurn = 'L';
 int status = 0;
 
 // variables used in lineFollowPID() function
-int position = 0;
-int P, D;
-int I =0;
+int sensors_average, sensors_sum, position, P, I, D;
 //int leftMotorSpeed, rightMotorSpeed;
 int error =0; // set this starting to 0 in main loop
 int P_past =0; // set this starting to 0 in main loop
-int set_point =-1;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
+int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
 float Kp, Ki, Kd;
 
 // defining speed of robot
-int speed = 75;
+int speed = 100;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -269,7 +267,7 @@ void loop() {
     //junctionDetect();
     delay(500);
 
-    /* if (status == 0) { // start sequence
+    if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
         turn(left); // (might need to use a different turn function)
         status = 1;
@@ -334,7 +332,7 @@ void loop() {
         status = 1;
       }
     }
- */
+
 
 }
 
