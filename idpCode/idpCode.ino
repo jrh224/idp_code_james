@@ -31,6 +31,14 @@ char nextTurn = 'L';
 // variable for robot's current goal
 int status = 0;
 
+// variables used in lineFollowPID() function
+int sensors_average, sensors_sum, position, P, I, D;
+//int leftMotorSpeed, rightMotorSpeed;
+int error =0; // set this starting to 0 in main loop
+int P_past =0; // set this starting to 0 in main loop
+int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
+float Kp, Ki, Kd;
+
 // defining speed of robot
 int speed = 100;
 int leftMotorSpeed = speed;
@@ -147,7 +155,7 @@ void lineFollow() {
 }
 
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
-  if (followPins[0]&&followPins[1] || followPins[3]&&followPins[2]) { //if all RHS or all LHS sensors detect a line
+  if ((followPins[0]&&followPins[1]) || (followPins[3]&&followPins[2])) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
@@ -169,21 +177,19 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 
 
-/* void lineFollowPID(){
+void lineFollowPID(){
   // must do takeLineReadings() before this function
   for (int i = 0; i < 4; i++) {
-    int sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
-    int sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
+    sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
+    sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
   }
-  int position = int(sensors_average/sensors_sum);
+  position = int(sensors_average/sensors_sum);
 
-  float Kp, Ki, Kd;
   // value of kp ki kd is found by testing
   Kp = 1.0;
   Ki = 1.0;
   Kd = 1.0;
- */
-  /*
+
   // only really need to run the below when finding the set point ,Kp, Ki ,Kd
   Serial.print(sensors_average);
   Serial.print(' '); 
@@ -191,9 +197,9 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
   Serial.print(' '); 
   Serial.print(position); 
   Serial.println(); 
-  delay(2000); */
-
-/*   int leftMotorSpeed, rightMotorSpeed;
+  delay(2000);
+/* 
+  int leftMotorSpeed, rightMotorSpeed;
   int error; // set this starting to 0 in main loop
   int P_past; // set this starting to 0 in main loop
   int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from above) is the set point
@@ -223,9 +229,9 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     rightMotorSpeed = speed;
     leftMotorSpeed = speed + error;
     set_motors(leftMotorSpeed, rightMotorSpeed)
-    } 
+    }  */
   
-} */
+}
 
 
 void moveOutStartBox(){
@@ -275,7 +281,7 @@ void detectColour(){
 void loop() {
     //detectColour();
     takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollow();
+    lineFollowPID();
     //junctionDetect();
     delay(500);
 
