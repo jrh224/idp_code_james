@@ -32,11 +32,10 @@ char nextTurn = 'L';
 int status = 0;
 
 // variables used in lineFollowPID() function
-int sensors_average, sensors_sum, position, P, I, D;
+int pid_output, P, I, D;
 //int leftMotorSpeed, rightMotorSpeed;
 int error =0; // set this starting to 0 in main loop
-int P_past =0; // set this starting to 0 in main loop
-int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
+int last_error =0; // set this starting to 0 in main loop
 float Kp, Ki, Kd;
 
 // defining speed of robot
@@ -179,35 +178,39 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 void lineFollowPID(){
   // must do takeLineReadings() before this function
-  position += followPins[0] * 2000 
-                      + followPins[1] * 1000
-                      + followPins[2] * -1000
-                      + followPins[3] * -2000;  // calculating mean for PID
+  // calculating the error
+  error += followPins[0] * 2 
+                      + followPins[1] * 1
+                      + followPins[2] * -1
+                      + followPins[3] * -2;  // calculating mean for PID
+  error /= 100; /* sensor readings are in range 0-1023, so dividing error 
+  by 100 scales error value to a range of approximately -10 to 10, which 
+  is a more reasonable range for the PID controller to work with. */
 
   // value of kp ki kd is found by testing
-  Kp = 0.07; // proportionality
-  Ki = 0.0001; // integral
-  Kd = 0.05; // derivative
+  Kp = 0.03; // proportionality
+  Ki = 0.05; // integral
+  Kd = 0.1; // derivative
 
-  P = position;
+// calculating PID output
+  P = error;
   I = I + P;
-  D = P - P_past;
-  P_past = P;
+  D = error - last_error;
+  pid_output = P*Kp + I*Ki + D*Kd;
+  last_error = error;
 
-  error = P*Kp + I*Ki + D*Kd;
   // restricting error value between ±50 --> can change this value to fit
-  if (error<-50) {error=-50;}
-  if (error>50) {error=50;}
+  if (pid_output<-50) {pid_output=-50;}
+  if (pid_output>50) {pid_output=50;}
 
-  Serial.println(error); 
+  Serial.println(pid_output); 
 
-  // adjusting speed of each motor by the error
-
-  rightMotorSpeed = speed + error; 
+  // adjusting speed of each motor by the pid_output
+  rightMotorSpeed = speed + pid_output; 
   Serial.println("right motor speed");
   Serial.println(rightMotorSpeed);
 
-  leftMotorSpeed = speed - error;
+  leftMotorSpeed = speed - pid_output;
   Serial.println("left motor speed");
   Serial.println(leftMotorSpeed);
   
