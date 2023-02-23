@@ -28,6 +28,8 @@ int requiredJunctReadings = 5;
 int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
+// variable for robot's current goal
+int status = 0;
 
 // defining speed of robot
 int speed = 100;
@@ -149,7 +151,9 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     currentJunctReadings += 10;
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
-      numJunctions --;
+      if (numJunctions > 0) {
+        numJunctions --; // only decrement numJunctions if it is greater than zero
+      }
       Serial.println("Junction detected!");
     }
     else if (currentJunctReadings > 0) {
@@ -225,7 +229,6 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 
 void moveOutStartBox(){
-  numJunctions = 1;
   nextTurn = 'L';
   turn('F'); // robot moves forward
 // numJunctions--; //robot acknowledges edge of box as one junction --> numJunction = 0 now
@@ -251,18 +254,16 @@ void dropOffCube(){
 }
 
 
-int blueBoxDetected(){
+void blueBoxDetected(){
     Serial.println("Blue box detected.");
     // must count 1 junction to reach the desired drop off spot
-    numJunctions = 0; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
-    return numJunctions;
+    numJunctions = 1; // count down --> if this value hits 0, then robo must turn at that junction
 }
 
-int brownBoxDetected() {
+void brownBoxDetected() {
     Serial.println("Brown box detected.");
     // must count 3 junctions to reach the desired drop off spot
-    numJunctions = 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
-    return numJunctions;
+    numJunctions = 3; // count down --> if this value hits 0, then robo must turn at that junction
 }
 
 void detectColour(){
@@ -278,33 +279,72 @@ void loop() {
     //junctionDetect();
     delay(500);
 
-    /*
-    if (start sequence):
-      moveOutStartBox();
-      start sequence = false;
+    if (status == 0) { // start sequence
+      if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
+        turn(left); // (might need to use a different turn function)
+        status = 1;
+        numJunctions = 2;
+      }
+    }
+    if (status == 1) { //line following to block
+      PID(); //run PID line follower algorithm
+      if (numJunctions == 0) { // turn once at correct junction
+        turn(right);
+        status = 2;
+      }
+    }
+    if (status == 2) { // turning off line to hunt for block
+      turn(right);
+      while (block not found && count < max_count) {
+        PID();
+        count ++;
+      }
+      if (block found) {
+        turn(180degrees);
+        status = 3;
+      }
+      else {
+        ;
+        // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
+      }
+    }
+    if (status == 3) { //taking block back to line
+      
+      PID();
+      if (numJunctions == 0) { // once found line, turn left
+        turn(left);
+        detectColour(); // *this contains a 'set number of junctions' command* - if there are issues, maybe try running detectColour early on when the block is first found. Be careful though since this will mess up the numJunctions for finding the line again
+        status = 4;
+      }
+    }
+    if (status == 4) { // taking block along line to the correct junction for drop off. Num Junctions was set in the previous code, so this applies regardless of block colour
+      PID();
+      if (numJunctions == 0) {
+        turn(right);
+        numJunctions = 1;
+        status = 5;
+      }
+    }
+    if (status == 5) {
+      PID();
+      if (numJunctions = 0) {
+        ;
+        // MOVE FORWARDS A LITTLE BIT MORE
+        // REVERSE TO LEAVE BLOCK BEHIND
+        // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND
+        // TURN 180 DEGREES
+        // MOVE FORWARDS UNTIL LINE DETECTED
+        // TURN LEFT
+        if (detection) { // set number of junctions for return journey depending on which block was deposited
+          numJunctions = 1;
+        }
+        else {
+          numJunctions = 3;
+        }
+        status = 1;
+      }
+    }
 
-    if (numJunctions < 0):
-      90degreeturn(nextTurn); [then go back to line following]
-    */
-
-
-    // if (start sequence) {
-    //   turn(F); // move forwards
-    //   if (start box boundary detected) {
-    //     // note that box boundary has been found
-    //     // wait for a robot to move past the line -- e.g. maybe use ticker, or add a count to the loop?
-    //     // then begin line following junction, and set 'currently looking for cross junction' to true
-    //   }
-    // }
-    // if (T junction on RHS detected && currently looking for RHS turn cross junction) { //e.g. looking for box pick up spot, or box drop off spot
-
-    // }
-    // if (T junction on LHS detected && currently looking for LHS turn cross junction) { //e.g just out start box,
-
-    // }
-    // if (right hand side T junction detected && currently looking for RHS junction) { //e.g. 
-
-    // }
 
 }
 
