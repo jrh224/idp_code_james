@@ -183,9 +183,8 @@ void lineFollowPID(){
                       + followPins[1] * 1
                       + followPins[2] * -1
                       + followPins[3] * -2;  // calculating mean for PID
-  error /= 100; /* sensor readings are in range 0-1023, so dividing error 
-  by 100 scales error value to a range of approximately -10 to 10, which 
-  is a more reasonable range for the PID controller to work with. */
+  error /= 100; /* sensor readings are in range 0-1023, so dividing error by 100 
+  scales error value to a range of approx -10-10, which is more reasonable*/
 
   // value of kp ki kd is found by testing
   Kp = 0.03; // proportionality
