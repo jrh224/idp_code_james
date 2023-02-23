@@ -32,7 +32,9 @@ char nextTurn = 'L';
 int status = 0;
 
 // variables used in lineFollowPID() function
-int sensors_average, sensors_sum, position, P, I, D;
+int position = 0;
+int P, D;
+int I =0;
 //int leftMotorSpeed, rightMotorSpeed;
 int error =0; // set this starting to 0 in main loop
 int P_past =0; // set this starting to 0 in main loop
@@ -40,7 +42,7 @@ int set_point =-1;  // need to find this set point --> place bot at center of th
 float Kp, Ki, Kd;
 
 // defining speed of robot
-int speed = 100;
+int speed = 75;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -179,77 +181,40 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 
 void lineFollowPID(){
   // must do takeLineReadings() before this function
-  for (int i = 0; i < 4; i++) {
-    sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
-    sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
-  }
-  position = int(sensors_average/sensors_sum);
+  position += followPins[0] * 2000 
+                      + followPins[1] * 1000
+                      + followPins[2] * -1000
+                      + followPins[3] * -2000;  // calculating mean for PID
 
   // value of kp ki kd is found by testing
-  Kp = 1; // proportional
-  Ki = 0.001;
-  Kd = 1; // damping
+  Kp = 0.07; // proportionality
+  Ki = 0.0001; // integral
+  Kd = 0.05; // derivative
 
-  // only really need to run the below when finding the set point ,Kp, Ki ,Kd
- // Serial.print(sensors_average);
-  //Serial.print(' '); 
-  //Serial.print(sensors_sum); 
-  // Serial.print(' '); 
-  Serial.print(position); 
-  Serial.println(); 
-  delay(2000);
- 
-  //int leftMotorSpeed, rightMotorSpeed;
-  //int error; // set this starting to 0 in main loop
-  //int P_past; // set this starting to 0 in main loop
-  //int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from above) is the set point
-
-  P = position - set_point; // use modulus of this value!!!
-  if (P<0){P*=-1;}
+  P = position;
   I = I + P;
   D = P - P_past;
   P_past = P;
 
   error = P*Kp + I*Ki + D*Kd;
-  Serial.println(error); 
-
   // restricting error value between ±50 --> can change this value to fit
   if (error<-50) {error=-50;}
   if (error>50) {error=50;}
 
+  Serial.println(error); 
 
-  // If error is less than zero then calc right turn speed values
-  if (error<0)
-    {
-    Serial.println("erro<0");
+  // adjusting speed of each motor by the error
 
-    rightMotorSpeed = speed - error; 
-    Serial.println("right motor speed");
-    Serial.println(rightMotorSpeed);
+  rightMotorSpeed = speed + error; 
+  Serial.println("right motor speed");
+  Serial.println(rightMotorSpeed);
 
-    leftMotorSpeed = speed;
-    Serial.println("left motor speed");
-    Serial.println(leftMotorSpeed);
-    
-    set_motors(leftMotorSpeed, rightMotorSpeed);
-    }
-
-  // If error is greater than zero calc left turn values
-  else
-    {
-    Serial.println("erro>0");
-
-    rightMotorSpeed = speed;
-    Serial.println("right motor speed");
-    Serial.println(rightMotorSpeed);
-
-    leftMotorSpeed = speed + error;
-    Serial.println("left motor speed");
-    Serial.println(leftMotorSpeed);
-
-    set_motors(leftMotorSpeed, rightMotorSpeed);
-    }  
+  leftMotorSpeed = speed - error;
+  Serial.println("left motor speed");
+  Serial.println(leftMotorSpeed);
   
+  set_motors(leftMotorSpeed, rightMotorSpeed);
+    
 }
 
 
