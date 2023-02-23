@@ -30,7 +30,8 @@ int currentJunctReadings = 0;
 char nextTurn = 'L';
 
 // variables used in lineFollowPID() function
-int sensors_average, sensors_sum, position, P, I, D leftMotorSpeed, rightMotorSpeed;
+int sensors_average, sensors_sum, position, P, I, D;
+//int leftMotorSpeed, rightMotorSpeed;
 int error =0; // set this starting to 0 in main loop
 int P_past =0; // set this starting to 0 in main loop
 int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
@@ -152,7 +153,7 @@ void lineFollow() {
 }
 
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
-  if (followPins[0]&&followPins[1] || followPins[3]&&followPins[2]) { //if all RHS or all LHS sensors detect a line
+  if ((followPins[0]&&followPins[1]) || (followPins[3]&&followPins[2])) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
