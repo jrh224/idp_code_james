@@ -29,6 +29,13 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 
+// variables used in lineFollowPID() function
+int sensors_average, sensors_sum, position, P, I, D leftMotorSpeed, rightMotorSpeed;
+int error =0; // set this starting to 0 in main loop
+int P_past =0; // set this starting to 0 in main loop
+int set_point;  // need to find this set point --> place bot at center of the line and the position reading (from code in the fucntion) is the set point
+float Kp, Ki, Kd;
+
 // defining speed of robot
 int speed = 100;
 int leftMotorSpeed = speed;
@@ -168,18 +175,16 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 void lineFollowPID(){
   // must do takeLineReadings() before this function
   for (int i = 0; i < 4; i++) {
-    int sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
-    int sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
+    sensors_average += followPins[i] * i * 1000;  // calculating weighted mean for PID
+    sensors_sum += int(followPins[i]);  // calculating sum of sensor readings
   }
-  int position = int(sensors_average/sensors_sum);
+  position = int(sensors_average/sensors_sum);
 
-  float Kp, Ki, Kd;
   // value of kp ki kd is found by testing
   Kp = 1.0;
   Ki = 1.0;
   Kd = 1.0;
 
-  
   // only really need to run the below when finding the set point ,Kp, Ki ,Kd
   Serial.print(sensors_average);
   Serial.print(' '); 
@@ -274,7 +279,7 @@ void detectColour(){
 void loop() {
     //detectColour();
     takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollow();
+    lineFollowPID();
     //junctionDetect();
     delay(500);
 
