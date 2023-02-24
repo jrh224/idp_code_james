@@ -99,8 +99,12 @@ void turn(char dir) {
     case 'F':
       // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
       Serial.println("Go forward");
-      leftMotorSpeed = speed;
-      rightMotorSpeed = speed;
+      leftMotorSpeed=speed;
+      rightMotorSpeed=speed;
+      /* if (leftMotorSpeed > speed) {leftMotorSpeed -= 5;}
+      else {leftMotorSpeed += 5;}
+      if (rightMotorSpeed > speed) {rightMotorSpeed -= 5;}
+      else {rightMotorSpeed += 5;} */
       set_motors(leftMotorSpeed,rightMotorSpeed);
       break;
 
@@ -108,8 +112,10 @@ void turn(char dir) {
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-      leftMotorSpeed = leftMotorSpeed - 5;
-      rightMotorSpeed = rightMotorSpeed + 5;
+      leftMotorSpeed = leftMotorSpeed - 7;
+      rightMotorSpeed = rightMotorSpeed + 7;
+      if (rightMotorSpeed >= 255) {rightMotorSpeed=255;}
+      if (leftMotorSpeed <= 0) {leftMotorSpeed=0;}
       set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
 
@@ -117,8 +123,10 @@ void turn(char dir) {
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-      leftMotorSpeed = leftMotorSpeed + 5;
-      rightMotorSpeed = rightMotorSpeed - 5;
+      leftMotorSpeed = leftMotorSpeed + 7;
+      rightMotorSpeed = rightMotorSpeed - 7;
+      if (leftMotorSpeed >= 255) {leftMotorSpeed=255;}
+      if (rightMotorSpeed <= 0) {rightMotorSpeed=0;}
       set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
 
@@ -183,14 +191,14 @@ void lineFollowPID(){
                       + followPins[1] * 1
                       + followPins[2] * -1
                       + followPins[3] * -2;  // calculating mean for PID
-  error /= 1; /* sensor readings are in range 0-1023, so dividing error by 100 
-  scales error value to a range of approx -10-10, which is more reasonable*/
+  //error /= 1; //sensor readings are in range 0-1023, so dividing error by 100 
+  //scales error value to a range of approx -10-10, which is more reasonable
 
-  if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
+  //if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
   // to zero, to remove integral wind up
 
   // value of kp ki kd is found by testing
-  Kp = 1.5; // proportionality
+  Kp = 0.05; // proportionality
   Ki = 0; // integral
   Kd = 0.0; // derivative
 
@@ -207,15 +215,19 @@ void lineFollowPID(){
 
   Serial.println(pid_output); 
 
-  pid_output*=1.5;
+  //pid_output*=0.25;
   // adjusting speed of each motor by the pid_output
+ // if (rightMotorSpeed == speed)
+ { 
   rightMotorSpeed = speed + pid_output; 
   Serial.println("right motor speed");
-  Serial.println(rightMotorSpeed);
+  Serial.println(rightMotorSpeed);}
 
+ // if (leftMotorSpeed ==speed)
+ { 
   leftMotorSpeed = speed - pid_output;
   Serial.println("left motor speed");
-  Serial.println(leftMotorSpeed);
+  Serial.println(leftMotorSpeed);}
   
   set_motors(leftMotorSpeed, rightMotorSpeed);
     
@@ -269,7 +281,7 @@ void detectColour(){
 void loop() {
     //detectColour();
     takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollowPID();
+    lineFollow();
     //junctionDetect();
     delay(100);
 /* 
