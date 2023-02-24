@@ -39,7 +39,7 @@ int last_error =0; // set this starting to 0 in main loop
 float Kp, Ki, Kd;
 
 // defining speed of robot
-int speed = 100;
+int speed = 75;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -183,13 +183,16 @@ void lineFollowPID(){
                       + followPins[1] * 1
                       + followPins[2] * -1
                       + followPins[3] * -2;  // calculating mean for PID
-  error /= 100; /* sensor readings are in range 0-1023, so dividing error by 100 
+  error /= 1; /* sensor readings are in range 0-1023, so dividing error by 100 
   scales error value to a range of approx -10-10, which is more reasonable*/
 
+  if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
+  // to zero, to remove integral wind up
+
   // value of kp ki kd is found by testing
-  Kp = 0.03; // proportionality
-  Ki = 0.05; // integral
-  Kd = 0.1; // derivative
+  Kp = 1.5; // proportionality
+  Ki = 0; // integral
+  Kd = 0.0; // derivative
 
 // calculating PID output
   P = error;
@@ -204,6 +207,7 @@ void lineFollowPID(){
 
   Serial.println(pid_output); 
 
+  pid_output*=1.5;
   // adjusting speed of each motor by the pid_output
   rightMotorSpeed = speed + pid_output; 
   Serial.println("right motor speed");
@@ -267,7 +271,7 @@ void loop() {
     takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
     lineFollowPID();
     //junctionDetect();
-    delay(500);
+    delay(100);
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
@@ -314,6 +318,7 @@ void loop() {
         numJunctions = 1;
         status = 5;
       }
+      
     }
     if (status == 5) {
       PID();
@@ -333,7 +338,7 @@ void loop() {
         }
         status = 1;
       } */
-    }
+    //}
 
 
 }
