@@ -268,7 +268,7 @@ void loop() {
     lineFollowPID();
     //junctionDetect();
     delay(500);
-
+/* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
         turn(left); // (might need to use a different turn function)
@@ -332,7 +332,7 @@ void loop() {
           numJunctions = 3;
         }
         status = 1;
-      }
+      } */
     }
 
 
