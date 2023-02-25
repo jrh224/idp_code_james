@@ -31,12 +31,7 @@ char nextTurn = 'L';
 // variable for robot's current goal
 int status = 0;
 
-// variables used in lineFollowPID() function
-int pid_output, P, I, D;
-//int leftMotorSpeed, rightMotorSpeed;
-int error =0; // set this starting to 0 in main loop
-int last_error =0; // set this starting to 0 in main loop
-float Kp, Ki, Kd;
+
 
 // defining speed of robot
 int speed = 75;
@@ -112,8 +107,8 @@ void turn(char dir) {
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-      leftMotorSpeed = leftMotorSpeed - 7;
-      rightMotorSpeed = rightMotorSpeed + 7;
+      leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed - this works from testing
+      rightMotorSpeed = rightMotorSpeed + 0.1*speed; 
       if (rightMotorSpeed >= 255) {rightMotorSpeed=255;}
       if (leftMotorSpeed <= 0) {leftMotorSpeed=0;}
       set_motors(leftMotorSpeed, rightMotorSpeed);
@@ -123,8 +118,8 @@ void turn(char dir) {
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-      leftMotorSpeed = leftMotorSpeed + 7;
-      rightMotorSpeed = rightMotorSpeed - 7;
+      leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed - this works from testing
+      rightMotorSpeed = rightMotorSpeed - 0.1*speed;
       if (leftMotorSpeed >= 255) {leftMotorSpeed=255;}
       if (rightMotorSpeed <= 0) {rightMotorSpeed=0;}
       set_motors(leftMotorSpeed, rightMotorSpeed);
@@ -133,16 +128,19 @@ void turn(char dir) {
     case 'C':
       // SET MOTORS TO ROTATE CLOCKWISE
       Serial.println("Rotate clockwise");
-      /*       
-      leftMotorSpeed = leftMotorSpeed + 20;  // may need to change these values according to distance between wheels
+            
+      leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
-      rightMotorSpeed = rightMotorSpeed - 20;
-      set_motors(leftMotorSpeed, rightMotorSpeed) */
+      rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
+      set_motors(leftMotorSpeed, rightMotorSpeed)
       break;
     
     case 'A':
     // SET MOTORS TO ROTATE ANTICLOCKWISE
       Serial.println("Rotate anticlockwise");
+      rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
+      // and radius of curvature i.e. w = v/r = const for all wheels
+      leftMotorSpeed = 0;
       break;
   }
 
@@ -182,56 +180,6 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
 
-
-
-void lineFollowPID(){
-  // must do takeLineReadings() before this function
-  // calculating the error
-  error += followPins[0] * 2 
-                      + followPins[1] * 1
-                      + followPins[2] * -1
-                      + followPins[3] * -2;  // calculating mean for PID
-  //error /= 1; //sensor readings are in range 0-1023, so dividing error by 100 
-  //scales error value to a range of approx -10-10, which is more reasonable
-
-  //if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
-  // to zero, to remove integral wind up
-
-  // value of kp ki kd is found by testing
-  Kp = 0.05; // proportionality
-  Ki = 0; // integral
-  Kd = 0.0; // derivative
-
-// calculating PID output
-  P = error;
-  I = I + P;
-  D = error - last_error;
-  pid_output = P*Kp + I*Ki + D*Kd;
-  last_error = error;
-
-  // restricting error value between ±50 --> can change this value to fit
-  if (pid_output<-50) {pid_output=-50;}
-  if (pid_output>50) {pid_output=50;}
-
-  Serial.println(pid_output); 
-
-  //pid_output*=0.25;
-  // adjusting speed of each motor by the pid_output
- // if (rightMotorSpeed == speed)
- { 
-  rightMotorSpeed = speed + pid_output; 
-  Serial.println("right motor speed");
-  Serial.println(rightMotorSpeed);}
-
- // if (leftMotorSpeed ==speed)
- { 
-  leftMotorSpeed = speed - pid_output;
-  Serial.println("left motor speed");
-  Serial.println(leftMotorSpeed);}
-  
-  set_motors(leftMotorSpeed, rightMotorSpeed);
-    
-}
 
 
 void moveOutStartBox(){
@@ -287,13 +235,13 @@ void loop() {
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-        turn(left); // (might need to use a different turn function)
+        turn(left); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
         status = 1;
         numJunctions = 2;
       }
     }
     if (status == 1) { //line following to block
-      PID(); //run PID line follower algorithm
+      lineFollow(); //run line follower algorithm
       if (numJunctions == 0) { // turn once at correct junction
         turn(right);
         status = 2;
@@ -302,7 +250,7 @@ void loop() {
     if (status == 2) { // turning off line to hunt for block
       turn(right);
       while (block not found && count < max_count) {
-        PID();
+        lineFollow();
         count ++;
       }
       if (block found) {
@@ -312,19 +260,24 @@ void loop() {
       else {
         ;
         // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
+        // set a timer, if time has gone above a value, block could reverse???
       }
     }
     if (status == 3) { //taking block back to line
       
-      PID();
+      lineFollow();
       if (numJunctions == 0) { // once found line, turn left
         turn(left);
-        detectColour(); // *this contains a 'set number of junctions' command* - if there are issues, maybe try running detectColour early on when the block is first found. Be careful though since this will mess up the numJunctions for finding the line again
+        detectColour(); // *this contains a 'set number of junctions' command* - if 
+        //there are issues, maybe try running detectColour early on when the block is 
+        //first found. Be careful though since this will mess up the numJunctions for 
+        //finding the line again
         status = 4;
       }
     }
-    if (status == 4) { // taking block along line to the correct junction for drop off. Num Junctions was set in the previous code, so this applies regardless of block colour
-      PID();
+    if (status == 4) { // taking block along line to the correct junction for drop off. 
+    //Num Junctions was set in the previous code, so this applies regardless of block colour
+      lineFollow();
       if (numJunctions == 0) {
         turn(right);
         numJunctions = 1;
@@ -333,13 +286,13 @@ void loop() {
       
     }
     if (status == 5) {
-      PID();
+      lineFollow();
       if (numJunctions = 0) {
         ;
         // MOVE FORWARDS A LITTLE BIT MORE
         // REVERSE TO LEAVE BLOCK BEHIND
-        // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND
-        // TURN 180 DEGREES
+        // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
+        // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
         // MOVE FORWARDS UNTIL LINE DETECTED
         // TURN LEFT
         if (detection) { // set number of junctions for return journey depending on which block was deposited
@@ -355,3 +308,63 @@ void loop() {
 
 }
 
+
+
+
+/*
+// variables used in lineFollowPID() function
+int pid_output, P, I, D;
+//int leftMotorSpeed, rightMotorSpeed;
+int error =0; // set this starting to 0 in main loop
+int last_error =0; // set this starting to 0 in main loop
+float Kp, Ki, Kd;
+
+void lineFollowPID(){
+  // must do takeLineReadings() before this function
+  // calculating the error
+  error += followPins[0] * 2 
+                      + followPins[1] * 1
+                      + followPins[2] * -1
+                      + followPins[3] * -2;  // calculating mean for PID
+  //error /= 1; //sensor readings are in range 0-1023, so dividing error by 100 
+  //scales error value to a range of approx -10-10, which is more reasonable
+
+  //if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
+  // to zero, to remove integral wind up
+
+  // value of kp ki kd is found by testing
+  Kp = 0.05; // proportionality
+  Ki = 0; // integral
+  Kd = 0.0; // derivative
+
+// calculating PID output
+  P = error;
+  I = I + P;
+  D = error - last_error;
+  pid_output = P*Kp + I*Ki + D*Kd;
+  last_error = error;
+
+  // restricting error value between ±50 --> can change this value to fit
+  if (pid_output<-50) {pid_output=-50;}
+  if (pid_output>50) {pid_output=50;}
+
+  Serial.println(pid_output); 
+
+  //pid_output*=0.25;
+  // adjusting speed of each motor by the pid_output
+ // if (rightMotorSpeed == speed)
+ { 
+  rightMotorSpeed = speed + pid_output; 
+  Serial.println("right motor speed");
+  Serial.println(rightMotorSpeed);}
+
+ // if (leftMotorSpeed ==speed)
+ { 
+  leftMotorSpeed = speed - pid_output;
+  Serial.println("left motor speed");
+  Serial.println(leftMotorSpeed);}
+  
+  set_motors(leftMotorSpeed, rightMotorSpeed);
+    
+}
+*/
