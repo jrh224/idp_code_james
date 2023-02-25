@@ -107,7 +107,7 @@ void turn(char dir) {
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
       Serial.println("Turn left");
-      leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed - this works from testing
+      leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed 
       rightMotorSpeed = rightMotorSpeed + 0.1*speed; 
       if (rightMotorSpeed >= 255) {rightMotorSpeed=255;}
       if (leftMotorSpeed <= 0) {leftMotorSpeed=0;}
@@ -118,7 +118,7 @@ void turn(char dir) {
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
       Serial.println("Turn right");
-      leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed - this works from testing
+      leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed
       rightMotorSpeed = rightMotorSpeed - 0.1*speed;
       if (leftMotorSpeed >= 255) {leftMotorSpeed=255;}
       if (rightMotorSpeed <= 0) {rightMotorSpeed=0;}
@@ -140,7 +140,7 @@ void turn(char dir) {
       Serial.println("Rotate anticlockwise");
       rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
-      leftMotorSpeed = 0;
+      leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
       break;
   }
 
