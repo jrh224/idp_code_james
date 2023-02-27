@@ -186,7 +186,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // LED flash function for when robot is moving
 void flashLED() {
   movementLEDstate = !movementLEDstate;
-  movementLED = movementLEDstate;
+  digitalWrite(movementLED, movementLEDstate);
 }
 
 
