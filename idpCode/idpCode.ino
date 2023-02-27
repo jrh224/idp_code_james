@@ -40,6 +40,7 @@ int speed = 75;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
+
 // function to set motor speeds
 void set_motors(int mot3speed, int mot4speed)
 {   motor3->setSpeed(mot3speed);
@@ -60,15 +61,14 @@ void setup() {
   pinMode(movementLED, OUTPUT); // set flashing LED pin as output
 
 // Check that motor shield has been found
-  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+/*   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
   }
-  Serial.println("Motor Shield found.");
+  Serial.println("Motor Shield found."); */
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  set_motors(speed, speed);
-
+  //set_motors(speed, speed); //TURN THIS BACK ON
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
@@ -135,7 +135,7 @@ void turn(char dir) {
       leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
-      set_motors(leftMotorSpeed, rightMotorSpeed)
+      set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
     
     case 'A':
@@ -186,6 +186,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // LED flash function for when robot is moving
 void flashLED() {
   movementLEDstate = !movementLEDstate;
+  Serial.print(movementLEDstate);
   digitalWrite(movementLED, movementLEDstate);
 }
 
@@ -236,10 +237,11 @@ void detectColour(){
 
 void loop() {
     //detectColour();
-    takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollow();
+    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    //lineFollow();
     //junctionDetect();
     delay(100);
+    flashLED();
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
