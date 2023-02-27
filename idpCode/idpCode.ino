@@ -1,6 +1,5 @@
 // Include the adafruit motor shield library
 #include <Adafruit_MotorShield.h>
-#include "Ticker.h"
 
 
 // Create the motor shield object with the default I2C address
@@ -18,6 +17,7 @@ const int followPin2 = 9; //LC
 const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
 const int detectColourPin = 7; 
+const int movementLED = 6; // pin for flashing LED when robot is moving
 
 // Variables initialised
 int followPins[4];
@@ -35,11 +35,15 @@ int status = 0;
 
 unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 1000;  // interval at which to blink (milliseconds)
+// variable for storing the movement LED state, so that it can be set in the flashLED() function
+int movementLEDstate = 0;
+
 
 // defining speed of robot
 int speed = 75;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
+
 
 // function to set motor speeds
 void set_motors(int mot3speed, int mot4speed)
@@ -58,17 +62,17 @@ void setup() {
   pinMode(followPin3, INPUT);
   pinMode(followPin4, INPUT);
   pinMode(detectColourPin, INPUT); // set colout detector pin as input
+  pinMode(movementLED, OUTPUT); // set flashing LED pin as output
 
 // Check that motor shield has been found
-  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+/*   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
   }
-  Serial.println("Motor Shield found.");
+  Serial.println("Motor Shield found."); */
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  set_motors(speed, speed);
-
+  //set_motors(speed, speed); //TURN THIS BACK ON
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
@@ -135,7 +139,7 @@ void turn(char dir) {
       leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
-      set_motors(leftMotorSpeed, rightMotorSpeed)
+      set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
     
     case 'A':
@@ -187,6 +191,12 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
 
+// LED flash function for when robot is moving
+void flashLED() {
+  movementLEDstate = !movementLEDstate;
+  Serial.print(movementLEDstate);
+  digitalWrite(movementLED, movementLEDstate);
+}
 
 
 void moveOutStartBox(){
@@ -244,6 +254,7 @@ void loop() {
       // if the LED is off turn it on and vice-versa:
       flashLED();
     delay(100);
+    flashLED();
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
