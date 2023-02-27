@@ -248,13 +248,16 @@ void loop() {
     //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
     //lineFollow();
     //junctionDetect();
-    if (currentMillis - previousMillis >= interval) {
+    if (currentMillis - previousMillis >= interval) 
+    {
       // save the last time you blinked the LED
       previousMillis = currentMillis;
       // if the LED is off turn it on and vice-versa:
       flashLED();
+    }
+
     delay(100);
-    flashLED();
+    
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
