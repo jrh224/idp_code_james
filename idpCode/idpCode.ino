@@ -39,6 +39,10 @@ int movementLEDstate = 0;
 unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 1000;  // interval at which to blink (milliseconds)
 
+// for moving forward for time 
+unsigned long previousTime =0;
+const long timeMovingForward = 5000;
+
 // defining speed of robot
 int speed = 75;
 int leftMotorSpeed = speed;
@@ -99,15 +103,25 @@ void turn(char dir) {
   switch(dir) {
 
     case 'F':
-      // SET MOTORS TO DRIVE FORWARDS IF NOT ALREADY
+      // SET MOTORS TO DRIVE FORWARDS for x seconds
       Serial.println("Go forward");
-      leftMotorSpeed=speed;
-      rightMotorSpeed=speed;
+      unsigned long currentTime = millis();
+      if (currentTime - previousTime >= timeMovingForward) 
+    {
+      // save the last time you blinked the LED
+      previousMillis = currentTime;
+      // if the LED is off turn it on and vice-versa:
+      set_motors(speed, speed);
+    }
+      
+
+      //leftMotorSpeed=speed;
+      //rightMotorSpeed=speed;
       /* if (leftMotorSpeed > speed) {leftMotorSpeed -= 5;}
       else {leftMotorSpeed += 5;}
       if (rightMotorSpeed > speed) {rightMotorSpeed -= 5;}
       else {rightMotorSpeed += 5;} */
-      set_motors(leftMotorSpeed,rightMotorSpeed);
+      //set_motors(leftMotorSpeed,rightMotorSpeed);
       break;
 
     case 'L':
@@ -148,6 +162,21 @@ void turn(char dir) {
       rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
+      break;
+
+    case 'l':
+      // move forward for x seconds - will have to find x with testing
+      turn('F')
+      // then turn(A) until LC finds the line 
+      turn('A')
+      break;
+
+    case 'r':
+      // move forward for x seconds - will have to find x with testing
+      turn('F')
+      // then turn(A) until LC finds the line 
+      turn('C')
+
       break;
   }
 
