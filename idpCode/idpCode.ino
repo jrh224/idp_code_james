@@ -16,6 +16,7 @@ const int followPin2 = 9; //LC
 const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
 const int detectColourPin = 7; 
+const int movementLED = 6; // pin for flashing LED when robot is moving
 
 // Variables initialised
 int followPins[4];
@@ -30,7 +31,8 @@ int currentJunctReadings = 0;
 char nextTurn = 'L';
 // variable for robot's current goal
 int status = 0;
-
+// variable for storing the movement LED state, so that it can be set in the flashLED() function
+int movementLEDstate = 0;
 
 
 // defining speed of robot
@@ -55,6 +57,7 @@ void setup() {
   pinMode(followPin3, INPUT);
   pinMode(followPin4, INPUT);
   pinMode(detectColourPin, INPUT); // set colout detector pin as input
+  pinMode(movementLED, OUTPUT); // set flashing LED pin as output
 
 // Check that motor shield has been found
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
@@ -180,6 +183,11 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
 
+// LED flash function for when robot is moving
+void flashLED() {
+  movementLEDstate = !movementLEDstate;
+  movementLED = movementLEDstate;
+}
 
 
 void moveOutStartBox(){
