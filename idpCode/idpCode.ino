@@ -142,6 +142,10 @@ void turn(char dir) {
       // and radius of curvature i.e. w = v/r = const for all wheels
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
       break;
+    
+    case 'l':
+
+    case 'r':
   }
 
 }
@@ -235,7 +239,7 @@ void loop() {
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-        turn(left); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
+        turn(l); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
         status = 1;
         numJunctions = 2;
       }
@@ -243,12 +247,12 @@ void loop() {
     if (status == 1) { //line following to block
       lineFollow(); //run line follower algorithm
       if (numJunctions == 0) { // turn once at correct junction
-        turn(right);
+        turn(r);
         status = 2;
       }
     }
     if (status == 2) { // turning off line to hunt for block
-      turn(right);
+      turn(r);
       while (block not found && count < max_count) {
         lineFollow();
         count ++;
@@ -267,7 +271,7 @@ void loop() {
       
       lineFollow();
       if (numJunctions == 0) { // once found line, turn left
-        turn(left);
+        turn(l);
         detectColour(); // *this contains a 'set number of junctions' command* - if 
         //there are issues, maybe try running detectColour early on when the block is 
         //first found. Be careful though since this will mess up the numJunctions for 
@@ -279,7 +283,7 @@ void loop() {
     //Num Junctions was set in the previous code, so this applies regardless of block colour
       lineFollow();
       if (numJunctions == 0) {
-        turn(right);
+        turn(r);
         numJunctions = 1;
         status = 5;
       }
