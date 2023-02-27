@@ -1,5 +1,7 @@
 // Include the adafruit motor shield library
 #include <Adafruit_MotorShield.h>
+#include "Ticker.h"
+
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -31,7 +33,8 @@ char nextTurn = 'L';
 // variable for robot's current goal
 int status = 0;
 
-
+unsigned long previousMillis = 0;  // will store last time LED was updated
+const long interval = 1000;  // interval at which to blink (milliseconds)
 
 // defining speed of robot
 int speed = 75;
@@ -232,9 +235,14 @@ void detectColour(){
 
 void loop() {
     //detectColour();
-    takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    lineFollow();
+    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+    //lineFollow();
     //junctionDetect();
+    if (currentMillis - previousMillis >= interval) {
+      // save the last time you blinked the LED
+      previousMillis = currentMillis;
+      // if the LED is off turn it on and vice-versa:
+      flashLED();
     delay(100);
 /* 
     if (status == 0) { // start sequence
