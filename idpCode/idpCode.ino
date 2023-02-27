@@ -40,7 +40,7 @@ int movementLEDstate = 0;
 unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 1000;  // interval at which to blink (milliseconds)
 
-// for moving forward for time 
+// for moving forward
 unsigned long previousTime =0;
 const long timeMovingForward = 5000;
 
@@ -247,7 +247,9 @@ void collectCube(){
 
 void dropOffCube(){
 // robot goes into box
+// lifts portal frame
 // robot reverses and keeps rotating until found white line
+// drop portal frame if its too tall to go through tunnel
 // by the end of this function, the robot must be line following again
 // numJunctions = 0 if dropped off a blue box
 // numJunctions = 2 if dropped off a brown box
@@ -291,7 +293,7 @@ void loop() {
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-        turn(left); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
+        turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
         status = 1;
         numJunctions = 2;
       }
@@ -299,12 +301,12 @@ void loop() {
     if (status == 1) { //line following to block
       lineFollow(); //run line follower algorithm
       if (numJunctions == 0) { // turn once at correct junction
-        turn(right);
+        turn('r');
         status = 2;
       }
     }
     if (status == 2) { // turning off line to hunt for block
-      turn(right);
+      turn('r');
       while (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
         count ++;
@@ -325,7 +327,7 @@ void loop() {
       
       lineFollow();
       if (numJunctions == 0) { // once found line, turn left
-        turn(left);
+        turn('l');
         detectColour(); // *this contains a 'set number of junctions' command* - if 
         //there are issues, maybe try running detectColour early on when the block is 
         //first found. Be careful though since this will mess up the numJunctions for 
@@ -337,7 +339,7 @@ void loop() {
     //Num Junctions was set in the previous code, so this applies regardless of block colour
       lineFollow();
       if (numJunctions == 0) {
-        turn(right);
+        turn('r');
         numJunctions = 1;
         status = 5;
       }
@@ -347,7 +349,7 @@ void loop() {
       lineFollow();
       if (numJunctions = 0) {
         ;
-        // MOVE FORWARDS A LITTLE BIT MORE
+        forwards(); // MOVE FORWARDS A LITTLE BIT MORE
         // LIFT UP PORTAL FRAME
         // REVERSE TO LEAVE BLOCK BEHIND
         // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
