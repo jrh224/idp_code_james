@@ -17,6 +17,7 @@ const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
 const int detectColourPin = 7; 
 const int movementLED = 6; // pin for flashing LED when robot is moving
+const int 
 
 // Variables initialised
 int followPins[4];
@@ -72,12 +73,12 @@ void setup() {
   Serial.println("Motor Shield found."); */
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  //set_motors(speed, speed); //TURN THIS BACK ON
+  set_motors(speed, speed);
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
-  //motor3->run(RELEASE);
-  //motor4->run(RELEASE);
+  motor3->run(RELEASE);
+  motor4->run(RELEASE);
 }
 
 
@@ -194,6 +195,11 @@ void flashLED() {
   digitalWrite(movementLED, movementLEDstate);
 }
 
+// function for lifting portal frame
+void liftPortalFrame() {
+
+}
+
 
 void moveOutStartBox(){
   nextTurn = 'L';
@@ -272,11 +278,13 @@ void loop() {
     }
     if (status == 2) { // turning off line to hunt for block
       turn(right);
-      while (block not found && count < max_count) {
+      while (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
         count ++;
       }
-      if (block found) {
+      if (block found) { // need distance sensor to determine whether or not block has been found
+        // lower portal frame
+
         turn(180degrees);
         status = 3;
       }
@@ -313,6 +321,7 @@ void loop() {
       if (numJunctions = 0) {
         ;
         // MOVE FORWARDS A LITTLE BIT MORE
+        // LIFT UP PORTAL FRAME
         // REVERSE TO LEAVE BLOCK BEHIND
         // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
         // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
