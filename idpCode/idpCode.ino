@@ -1,5 +1,6 @@
 // Include the adafruit motor shield library
 #include <Adafruit_MotorShield.h>
+#include <Servo.h>
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -17,7 +18,11 @@ const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
 const int detectColourPin = 7; 
 const int movementLED = 6; // pin for flashing LED when robot is moving
-const int 
+
+// initialise servo
+Servo myservo;
+const int portalRaisedPos = 0; // define the lowered and raised servo positions - needs calibrating in final robot
+const int portalLoweredPos = 90;
 
 // Variables initialised
 int followPins[4];
@@ -69,12 +74,15 @@ void setup() {
   pinMode(detectColourPin, INPUT); // set colout detector pin as input
   pinMode(movementLED, OUTPUT); // set flashing LED pin as output
 
+// attach servo object to pin 10 (maybe is pin 9?)
+  myservo.attach(10);
+
 // Check that motor shield has been found
-/*   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
   }
-  Serial.println("Motor Shield found."); */
+  Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
   set_motors(speed, speed);
@@ -223,8 +231,13 @@ void flashLED() {
 }
 
 // function for lifting portal frame
-void liftPortalFrame() {
+void raisePortalFrame() {
+  myservo.write(portalRaisedPos);
+}
 
+//function for lowering portal frame
+void lowerPortalFrame() {
+  myservo.write(portalLoweredPos);
 }
 
 
@@ -286,8 +299,14 @@ void loop() {
       // if the LED is off turn it on and vice-versa:
       flashLED();
     }
+
+    raisePortalFrame();
+    Serial.print("raising portal frame");
+    delay(10000);
+    lowerPortalFrame();
+    Serial.print("Lowering portal frame");
     
-    delay(100);
+    delay(10000);
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
