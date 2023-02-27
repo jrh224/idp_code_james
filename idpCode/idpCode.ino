@@ -35,6 +35,10 @@ int status = 0;
 int movementLEDstate = 0;
 
 
+// for flashing led
+unsigned long previousMillis = 0;  // will store last time LED was updated
+const long interval = 1000;  // interval at which to blink (milliseconds)
+
 // defining speed of robot
 int speed = 75;
 int leftMotorSpeed = speed;
@@ -240,8 +244,17 @@ void loop() {
     //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
     //lineFollow();
     //junctionDetect();
+    
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) 
+    {
+      // save the last time you blinked the LED
+      previousMillis = currentMillis;
+      // if the LED is off turn it on and vice-versa:
+      flashLED();
+    }
+    
     delay(100);
-    flashLED();
 /* 
     if (status == 0) { // start sequence
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
