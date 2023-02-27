@@ -99,30 +99,28 @@ void takeLineReadings() {
   Serial.println();
 }
 
-void turn(char dir) {
-  switch(dir) {
-
-    case 'F':
-      // SET MOTORS TO DRIVE FORWARDS for x seconds
+void forwards()
+{
+  // SET MOTORS TO DRIVE FORWARDS for x seconds
       Serial.println("Go forward");
       unsigned long currentTime = millis();
       if (currentTime - previousTime >= timeMovingForward) 
     {
       // save the last time you blinked the LED
-      previousMillis = currentTime;
+      previousTime = currentTime;
       // if the LED is off turn it on and vice-versa:
       set_motors(speed, speed);
-    }
-      
+    }  
+}
 
-      //leftMotorSpeed=speed;
-      //rightMotorSpeed=speed;
-      /* if (leftMotorSpeed > speed) {leftMotorSpeed -= 5;}
-      else {leftMotorSpeed += 5;}
-      if (rightMotorSpeed > speed) {rightMotorSpeed -= 5;}
-      else {rightMotorSpeed += 5;} */
-      //set_motors(leftMotorSpeed,rightMotorSpeed);
-      break;
+void turn(char dir) {
+  switch(dir) {
+
+    case 'F':
+      // SET MOTORS TO DRIVE FORWARDS for x seconds
+      forwards();
+
+    break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
@@ -166,16 +164,16 @@ void turn(char dir) {
 
     case 'l':
       // move forward for x seconds - will have to find x with testing
-      turn('F')
+      turn('F');
       // then turn(A) until LC finds the line 
-      turn('A')
+      turn('A');
       break;
 
     case 'r':
       // move forward for x seconds - will have to find x with testing
-      turn('F')
+      turn('F');
       // then turn(A) until LC finds the line 
-      turn('C')
+      turn('C');
 
       break;
   }
