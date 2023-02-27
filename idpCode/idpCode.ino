@@ -35,6 +35,7 @@ int status = 0;
 
 unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 1000;  // interval at which to blink (milliseconds)
+
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 
@@ -248,6 +249,8 @@ void loop() {
     //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
     //lineFollow();
     //junctionDetect();
+    
+    unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) 
     {
       // save the last time you blinked the LED
