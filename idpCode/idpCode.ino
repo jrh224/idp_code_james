@@ -300,16 +300,20 @@ void loop() {
       lineFollow(); //run line follower algorithm
       if (numJunctions == 0) { // turn once at correct junction
         turn('r');
+        status = 11;
+      }
+    }
+    if (status == 11) { // don't stop spinning until line is found
+      if (followPins[2]) { // once RC pin has seen line, go to status 2 and line follow up to the block
         status = 2;
       }
     }
-    if (status == 2) { // turning off line to hunt for block
-      turn('r');
-      while (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
+    if (status == 2) { // hunting for block along block line
+      if (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
         count ++;
       }
-      if (block found) { // need distance sensor to determine whether or not block has been found
+      else if (block found) { // need distance sensor to determine whether or not block has been found
         // lower portal frame
 
         turn(180degrees);
