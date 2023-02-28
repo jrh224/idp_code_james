@@ -126,8 +126,7 @@ void turn(char dir) {
   switch(dir) {
 
     case 'F':
-      // SET MOTORS TO DRIVE FORWARDS for x seconds
-      forwards();
+      set_motors(speed, speed);
 
     break;
 
@@ -184,6 +183,11 @@ void turn(char dir) {
       // then turn(A) until LC finds the line 
       turn('C');
 
+      break;
+    
+    case 'f':
+      // SET MOTORS TO DRIVE FORWARDS for x seconds
+      forwards();
       break;
   }
 
