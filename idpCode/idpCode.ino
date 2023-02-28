@@ -314,10 +314,9 @@ void loop() {
         count ++;
       }
       else if (block found) { // need distance sensor to determine whether or not block has been found
-        // lower portal frame
-
-        turn(180degrees);
-        status = 3;
+        lowerPortalFrame();
+        turn('C');
+        status = 12;
       }
       else {
         ;
@@ -325,18 +324,33 @@ void loop() {
         // set a timer, if time has gone above a value, block could reverse???
       }
     }
+    if (status == 12) { // keep spinning 180 degrees with block until line is found again
+      if (followPins[2]) {
+        status = 3;
+        numJunctions = 1;
+      }
+    }
     if (status == 3) { //taking block back to line
-      
       lineFollow();
       if (numJunctions == 0) { // once found line, turn left
         turn('l');
+        status = 13;
+      }
+    }
+
+    if (status == 13) {
+      if (followPins[1]) {
+        status = 4;
         detectColour(); // *this contains a 'set number of junctions' command* - if 
         //there are issues, maybe try running detectColour early on when the block is 
         //first found. Be careful though since this will mess up the numJunctions for 
         //finding the line again
-        status = 4;
       }
     }
+
+    // CONTINUE HERE
+
+    
     if (status == 4) { // taking block along line to the correct junction for drop off. 
     //Num Junctions was set in the previous code, so this applies regardless of block colour
       lineFollow();
