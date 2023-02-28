@@ -43,7 +43,7 @@ int movementLEDstate = 0;
 
 // for flashing led
 unsigned long previousMillis = 0;  // will store last time LED was updated
-const long interval = 1000;  // interval at which to blink (milliseconds)
+const long interval = 50;  // interval at which to blink (milliseconds) - needs to be at 20Hz
 
 // for moving forward
 unsigned long previousTime =0;
@@ -240,35 +240,6 @@ void lowerPortalFrame() {
   myservo.write(portalLoweredPos);
 }
 
-
-void moveOutStartBox(){
-  nextTurn = 'L';
-  turn('F'); // robot moves forward
-// numJunctions--; //robot acknowledges edge of box as one junction --> numJunction = 0 now
-// at next Junction, robo turns left
-// by the end of this function, the robot must have turned left and started line following
-}
-
-void collectCube(){
-// robo should already have turned left and be line following towards the cube
-// robo knows how far it is from the cube using the sensor
-// cubeIsNear = 1 (or this may be an analogue signal in which case need to test i.e. if (distance<xyz) {cubeIsNear = 1;})
-// robo stops
-// robo rotates clockwise until white line found again
-// by the end of this function, the robot must be line following again
-}
-
-void dropOffCube(){
-// robot goes into box
-// lifts portal frame
-// robot reverses and keeps rotating until found white line
-// drop portal frame if its too tall to go through tunnel
-// by the end of this function, the robot must be line following again
-// numJunctions = 0 if dropped off a blue box
-// numJunctions = 2 if dropped off a brown box
-}
-
-
 void blueBoxDetected(){
     Serial.println("Blue box detected.");
     // must count 1 junction to reach the desired drop off spot
@@ -310,7 +281,7 @@ void loop() {
     
     delay(10000);
 /* 
-    if (status == 0) { // start sequence
+    if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
         turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
         status = 1;
