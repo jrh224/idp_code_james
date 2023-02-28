@@ -308,13 +308,9 @@ void loop() {
         status = 2;
       }
     }
-<<<<<<< HEAD
-    if (status == 2) { // turning off line to hunt for block
-      while (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
-=======
+
     if (status == 2) { // hunting for block along block line
       if (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
->>>>>>> c58aaaa3d3aa89230c8733987692f49646d54454
         lineFollow();
         count ++;
       }
