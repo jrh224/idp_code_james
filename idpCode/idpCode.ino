@@ -304,7 +304,6 @@ void loop() {
       }
     }
     if (status == 2) { // turning off line to hunt for block
-      turn('r');
       while (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
         count ++;
