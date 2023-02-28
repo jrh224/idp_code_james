@@ -172,14 +172,14 @@ void turn(char dir) {
 
     case 'l':
       // move forward for x seconds - will have to find x with testing
-      turn('F');
+      turn('f');
       // then turn(A) until LC finds the line 
       turn('A');
       break;
 
     case 'r':
       // move forward for x seconds - will have to find x with testing
-      turn('F');
+      turn('f');
       // then turn(A) until LC finds the line 
       turn('C');
 
@@ -265,7 +265,6 @@ void detectColour(){
 void loop() {
     //detectColour();
     //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    //lineFollow();
     //junctionDetect();
     
     unsigned long currentMillis = millis();
@@ -288,6 +287,11 @@ void loop() {
     if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
         turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
+        status = 10;
+      }
+    }
+    if (status == 10) { // don't stop spinning until line is found
+      if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
         status = 1;
         numJunctions = 2;
       }
