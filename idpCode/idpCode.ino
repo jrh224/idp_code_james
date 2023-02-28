@@ -172,14 +172,14 @@ void turn(char dir) {
 
     case 'l':
       // move forward for x seconds - will have to find x with testing
-      turn('F');
+      turn('f');
       // then turn(A) until LC finds the line 
       turn('A');
       break;
 
     case 'r':
       // move forward for x seconds - will have to find x with testing
-      turn('F');
+      turn('f');
       // then turn(A) until LC finds the line 
       turn('C');
 
