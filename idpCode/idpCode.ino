@@ -349,7 +349,7 @@ void loop() {
     if (!blockFound){// && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       lineFollow();
       detectBlock();
-      blockFoundCount ++;
+      //blockFoundCount ++;
     }
     else if (blockFound) { // need distance sensor to determine whether or not block has been found
       turn('f'); // maybe will need a smaller distance than normal
