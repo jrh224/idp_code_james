@@ -421,63 +421,8 @@ void loop() {
       if (detection) { // set number of junctions for return journey depending on which block was deposited
         numJunctions = 1;
       }
-<<<<<<< HEAD
-    }
-    if (status == 3) { //taking block back to line
-      lineFollow();
-      if (numJunctions == 0) { // once found line, turn left
-        turn('l');
-        status = 13;
-      }
-    }
-
-    if (status == 13) {
-      if (followPins[1]) {
-        status = 4;
-        if (currentBlockColour = "blue") {
-          numJunctions = 1;
-        }
-        else {
-          numJunctions = 3;
-        }
-      }
-    }
-
-    // CONTINUE HERE
-
-    
-    if (status == 4) { // taking block along line to the correct junction for drop off. 
-    //Num Junctions was set in the previous code, so this applies regardless of block colour
-      lineFollow();
-      if (numJunctions == 0) {
-        turn('r'); // into the drop off box
-        numJunctions = 1;
-        status = 5;
-      }
-      
-    }
-    if (status == 5) {
-      lineFollow();
-      if (numJunctions = 0) {
-        ;
-        forwards(); // MOVE FORWARDS A LITTLE BIT MORE
-        // LIFT UP PORTAL FRAME
-        // REVERSE TO LEAVE BLOCK BEHIND
-        // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
-        // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
-        // MOVE FORWARDS UNTIL LINE DETECTED
-        // TURN LEFT
-        if (detection) { // set number of junctions for return journey depending on which block was deposited
-          numJunctions = 1;
-        }
-        else {
-          numJunctions = 3;
-        }
-        status = 1;
-=======
       else {
         numJunctions = 3;
->>>>>>> bb2d2b5ec91756f93615166098b913c1f367a780
       }
       status = 1;
     }
