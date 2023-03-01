@@ -19,6 +19,9 @@ const int followPin1 = 8; //LL
 const int followPin2 = 9; //LC
 const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
+const int blockTrigPin = 4; // pin for colour detector 
+const int blockEchoPin = 3; // pin for colour detector
+
 
 // initialise servo
 Servo myservo;
@@ -42,7 +45,11 @@ int status = 0;
 int movementLEDstate = 0;
 // variable for holding current block colour
 string currentBlockColour = null;
-
+// variables for finding block
+bool blockFound = false;
+long durationInDigit, distanceInCm;
+int detectBlockCount = 0;
+int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
 
 // for flashing led
 unsigned long previousMillis = 0;  // will store last time LED was updated
@@ -77,9 +84,13 @@ void setup() {
   pinMode(detectColourPinBlue, INPUT); // set colout detector pins as input
   pinMode(detectColourPinBrown, INPUT);
   pinMode(movementLED, OUTPUT); // set flashing LED pin as output
-
+  pinMode(blockTrigPin, OUTPUT);
+  pinMode(blockEchoPin, INPUT);
 // attach servo object to pin 10 (maybe is pin 9?)
   myservo.attach(10);
+
+  // setting trigger pin to low (used later in detectBlock function)
+  digitalWrite(blockTrigPin, LOW);
 
 // Check that motor shield has been found
    if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
@@ -262,6 +273,21 @@ void detectColour(){
   }
 }
 
+void detectBlock(){
+  //if block detected, set blockFound=true; else set blockFound=false;
+  detectBlockCount ++; // making a count so that the distance to the block is measured every 50 counts
+  if (detectBlockCount > 250) { // might have to change this value (larger value --> less frequent readings)
+    digitalWrite(blockTrigPin, HIGH); // setting trigger pin to high for 10ms
+    delayMicroseconds(10);
+    digitalWrite(blockTrigPin, LOW);
+    durationInDigit = pulseIn(blockEchoPin, HIGH); // the echo pin detects the signal given by the trigger pin
+    distanceInCm = (durationInDigit/5)/29.1; // calculating distance from block - might have to change with testing
+    detectBlockCount=0; // resetting count
+  }
+  if (distanceInCm<threshholdBlockDistance) {
+    blockFound = true;}
+}
+
 void loop() {
     //detectColour();
     //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
@@ -283,7 +309,7 @@ void loop() {
     Serial.print("Lowering portal frame");
     
     delay(10000);
-/* 
+ 
     if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
       if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
         turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
@@ -309,16 +335,19 @@ void loop() {
       }
     }
     if (status == 2) { // hunting for block along block line
-      if (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
+      if (!blockFound && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
+        
+        detectBlock();
         count ++;
       }
-      else if (block found) { // need distance sensor to determine whether or not block has been found
+      else if (blockFound) { // need distance sensor to determine whether or not block has been found
         turn('f'); // maybe will need a smaller distance than normal
         detectColour();
         lowerPortalFrame();
         turn('C');
         status = 12;
+        blockFound=false;
       }
       else {
         ;
@@ -383,8 +412,8 @@ void loop() {
           numJunctions = 3;
         }
         status = 1;
-      } */
-    //}
+      }
+    }
 
 
 }
