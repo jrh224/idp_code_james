@@ -53,6 +53,10 @@ int threshholdBlockDistance = 5; // distance in cm from block, at which point we
 bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
 int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
 
+//
+//int blockFoundCount = 0;
+//int maxBlockFoundCount = 50000000;
+
 // for flashing led
 unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 50;  // interval at which to blink (milliseconds) - needs to be at 20Hz
@@ -342,11 +346,10 @@ void loop() {
     }
   }
   if (status == 2) { // hunting for block along block line
-    if (!blockFound && count < max_count) { // use distance sensor to determine whether or not block has been found
+    if (!blockFound){// && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       lineFollow();
-      
       detectBlock();
-      count ++;
+      blockFoundCount ++;
     }
     else if (blockFound) { // need distance sensor to determine whether or not block has been found
       turn('f'); // maybe will need a smaller distance than normal
@@ -356,8 +359,8 @@ void loop() {
       status = 12;
       blockFound=false;
     }
-    else {
-      ;
+    //else {
+      //;
       // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
       // set a timer, if time has gone above a value, block could reverse???
     }
