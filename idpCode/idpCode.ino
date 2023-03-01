@@ -50,6 +50,8 @@ bool blockFound = false;
 long durationInDigit, distanceInCm;
 int detectBlockCount = 0;
 int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
+bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
+int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
 
 // for flashing led
 unsigned long previousMillis = 0;  // will store last time LED was updated
@@ -224,10 +226,12 @@ void lineFollow() {
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
   if ((followPins[0]&&followPins[1]) || (followPins[3]&&followPins[2])) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
+    notOnJunctionCount = 0; // if junction detected, then reset the notOnJunctionCounter
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
-      if (numJunctions > 0) {
+      if (numJunctions > 0 && movedAwayFromLastJunction) { // don't decrement junction code until robot has moved away from last junction i.e. to avoid multiple readings from same junction
         numJunctions --; // only decrement numJunctions if it is greater than zero
+        movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
       }
       Serial.println("Junction detected!");
     }
@@ -235,9 +239,13 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     currentJunctReadings -= 3;
     }
   }
-  else if ((followPins[0] && !followPins[1]) || (followPins[3] && !followPins[2]))
-  {Serial.println("Strayed from line. Line following no longer correct.");}
-  // need to add code for when just LL or just RR detects a line bc this might be an error
+  else if (!followPins[0] && !followPins[3]) { // only runs when not at a junction of any kind
+    notOnJunctionCount ++;
+    if (notOnJunctionCount > 10) { // if 10 readings indicate the robot has cleared the junction, then it is believable
+      notOnJunctionCount = 0;
+      movedAwayFromLastJunction = true;
+    }
+  }
 }
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
@@ -289,77 +297,128 @@ void detectBlock(){
 }
 
 void loop() {
-    //detectColour();
-    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    //junctionDetect();
+  takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+  junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
     
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) 
-    {
-      // save the last time you blinked the LED
-      previousMillis = currentMillis;
-      // if the LED is off turn it on and vice-versa:
-      flashLED();
-    }
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) 
+  {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+    // if the LED is off turn it on and vice-versa:
+    flashLED();
+  }
 
-    raisePortalFrame();
-    Serial.print("raising portal frame");
-    delay(10000);
-    lowerPortalFrame();
-    Serial.print("Lowering portal frame");
-    
-    delay(10000);
- 
-    if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
-      if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-        turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
-        status = 10;
-      }
+  raisePortalFrame();
+  Serial.print("raising portal frame");
+  delay(10000);
+  lowerPortalFrame();
+  Serial.print("Lowering portal frame");
+  
+  delay(10000);
+
+  if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
+    if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
+      turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
+      status = 10;
     }
-    if (status == 10) { // don't stop spinning until line is found
-      if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
-        status = 1;
-        numJunctions = 2;
-      }
+  }
+  if (status == 10) { // don't stop spinning until line is found
+    if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
+      status = 1;
+      numJunctions = 2;
     }
-    if (status == 1) { //line following to block
-      lineFollow(); //run line follower algorithm
-      if (numJunctions == 0) { // turn once at correct junction
-        turn('r');
-        status = 11;
-      }
+  }
+  if (status == 1) { //line following to block
+    lineFollow(); //run line follower algorithm
+    if (numJunctions == 0) { // turn once at correct junction
+      turn('r');
+      status = 11;
     }
-    if (status == 11) { // don't stop spinning until line is found
-      if (followPins[2]) { // once RC pin has seen line, go to status 2 and line follow up to the block
-        status = 2;
-      }
+  }
+  if (status == 11) { // don't stop spinning until line is found
+    if (followPins[2]) { // once RC pin has seen line, go to status 2 and line follow up to the block
+      status = 2;
     }
-    if (status == 2) { // hunting for block along block line
-      if (!blockFound && count < max_count) { // use distance sensor to determine whether or not block has been found
-        lineFollow();
-        
-        detectBlock();
-        count ++;
-      }
-      else if (blockFound) { // need distance sensor to determine whether or not block has been found
-        turn('f'); // maybe will need a smaller distance than normal
-        detectColour();
-        lowerPortalFrame();
-        turn('C');
-        status = 12;
-        blockFound=false;
-      }
-      else {
-        ;
-        // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
-        // set a timer, if time has gone above a value, block could reverse???
-      }
+  }
+  if (status == 2) { // hunting for block along block line
+    if (!blockFound && count < max_count) { // use distance sensor to determine whether or not block has been found
+      lineFollow();
+      
+      detectBlock();
+      count ++;
     }
-    if (status == 12) { // keep spinning 180 degrees with block until line is found again
-      if (followPins[2]) {
-        status = 3;
+    else if (blockFound) { // need distance sensor to determine whether or not block has been found
+      turn('f'); // maybe will need a smaller distance than normal
+      detectColour();
+      lowerPortalFrame();
+      turn('C');
+      status = 12;
+      blockFound=false;
+    }
+    else {
+      ;
+      // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
+      // set a timer, if time has gone above a value, block could reverse???
+    }
+  }
+  if (status == 12) { // keep spinning 180 degrees with block until line is found again
+    if (followPins[2]) {
+      status = 3;
+      numJunctions = 1;
+    }
+  }
+  if (status == 3) { //taking block back to line
+    lineFollow();
+    if (numJunctions == 0) { // once found line, turn left
+      turn('l');
+      status = 13;
+    }
+  }
+
+  if (status == 13) {
+    if (followPins[1]) {
+      status = 4;
+      if (currentBlockColour = "blue") {
         numJunctions = 1;
       }
+      else {
+        numJunctions = 3;
+      }
+    }
+  }
+
+  // CONTINUE HERE
+
+  
+  if (status == 4) { // taking block along line to the correct junction for drop off. 
+  //Num Junctions was set in the previous code
+    lineFollow();
+    if (numJunctions == 0) {
+      turn('r');
+      status = 14;
+    }
+    }
+  if (status == 14) {
+    if (followPins[2]) {
+      numJunctions = 1;
+      status = 5;
+    }
+  }
+  if (status == 5) {
+    lineFollow();
+    if (numJunctions = 0) {
+      forwards(); // MOVE FORWARDS A LITTLE BIT MORE
+      // LIFT UP PORTAL FRAME
+      // REVERSE TO LEAVE BLOCK BEHIND
+      // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
+      // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
+      // MOVE FORWARDS UNTIL LINE DETECTED
+      // TURN LEFT
+      if (detection) { // set number of junctions for return journey depending on which block was deposited
+        numJunctions = 1;
+      }
+<<<<<<< HEAD
     }
     if (status == 3) { //taking block back to line
       lineFollow();
@@ -412,8 +471,14 @@ void loop() {
           numJunctions = 3;
         }
         status = 1;
+=======
+      else {
+        numJunctions = 3;
+>>>>>>> bb2d2b5ec91756f93615166098b913c1f367a780
       }
+      status = 1;
     }
+  }
 
 
 }
