@@ -388,7 +388,7 @@ void loop() {
     //Num Junctions was set in the previous code, so this applies regardless of block colour
       lineFollow();
       if (numJunctions == 0) {
-        turn('r');
+        turn('r'); // into the drop off box
         numJunctions = 1;
         status = 5;
       }
