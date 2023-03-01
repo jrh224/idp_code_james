@@ -151,6 +151,12 @@ void turn(char dir) {
 
     break;
 
+    case 'B':
+    motor3->setSpeed(speed);
+    motor3->run(BACKWARD); // consider BACKWARDS if this doesn't work
+    motor4->setSpeed(speed);
+    motor4->run(BACKWARD);
+
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
@@ -431,8 +437,10 @@ void loop() {
     lineFollow();
     if (numJunctions = 0) {
       forwards(); // MOVE FORWARDS A LITTLE BIT MORE
-      // LIFT UP PORTAL FRAME
-      // REVERSE TO LEAVE BLOCK BEHIND
+      raisePortalFrame(); // LIFT UP PORTAL FRAME
+
+      //START HERE!!!!      
+      // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
       // MOVE FORWARDS UNTIL LINE DETECTED
