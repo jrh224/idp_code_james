@@ -12,12 +12,13 @@ Adafruit_DCMotor *motor3 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor4 = AFMS.getMotor(2);
 
 // Pins initalised
+const int movementLED = 5; // pin for flashing LED when robot is moving
+const int detectColourPinBrown = 6;
+const int detectColourPinBlue = 7; 
 const int followPin1 = 8; //LL
 const int followPin2 = 9; //LC
 const int followPin3 = 10; //RC
 const int followPin4 = 11; //RR
-const int detectColourPin = 7; 
-const int movementLED = 6; // pin for flashing LED when robot is moving
 
 // initialise servo
 Servo myservo;
@@ -39,6 +40,8 @@ char nextTurn = 'L';
 int status = 0;
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
+// variable for holding current block colour
+string currentBlockColour = null;
 
 
 // for flashing led
@@ -71,7 +74,8 @@ void setup() {
   pinMode(followPin2, INPUT);
   pinMode(followPin3, INPUT);
   pinMode(followPin4, INPUT);
-  pinMode(detectColourPin, INPUT); // set colout detector pin as input
+  pinMode(detectColourPinBlue, INPUT); // set colout detector pins as input
+  pinMode(detectColourPinBrown, INPUT);
   pinMode(movementLED, OUTPUT); // set flashing LED pin as output
 
 // attach servo object to pin 10 (maybe is pin 9?)
@@ -257,9 +261,17 @@ void brownBoxDetected() {
 }
 
 void detectColour(){
-  int detection = digitalRead(detectColourPin);
-  if (detection) {blueBoxDetected();}
-  else {brownBoxDetected();}
+  int brownPin = digitalRead(detectColourPinBrown);
+  int bluePin = digitalRead(detectColourPinBlue);
+  if (brownPin && bluePin){
+    // unsuccessful
+  }
+  else if (!brownPin && bluePin) {
+    currentBlockColour = "brown";
+  }
+  else {
+    currentBlockColour = "blue";
+  }
 }
 
 void loop() {
@@ -308,13 +320,14 @@ void loop() {
         status = 2;
       }
     }
-
     if (status == 2) { // hunting for block along block line
       if (block not found && count < max_count) { // use distance sensor to determine whether or not block has been found
         lineFollow();
         count ++;
       }
       else if (block found) { // need distance sensor to determine whether or not block has been found
+        turn('f'); // maybe will need a smaller distance than normal
+        detectColour();
         lowerPortalFrame();
         turn('C');
         status = 12;
@@ -342,10 +355,12 @@ void loop() {
     if (status == 13) {
       if (followPins[1]) {
         status = 4;
-        detectColour(); // *this contains a 'set number of junctions' command* - if 
-        //there are issues, maybe try running detectColour early on when the block is 
-        //first found. Be careful though since this will mess up the numJunctions for 
-        //finding the line again
+        if (currentBlockColour = "blue") {
+          numJunctions = 1;
+        }
+        else {
+          numJunctions = 3;
+        }
       }
     }
 
