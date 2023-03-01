@@ -364,7 +364,7 @@ void loop() {
       // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
       // set a timer, if time has gone above a value, block could reverse???
     }
-  }
+  
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
     if (followPins[2]) {
       status = 3;
