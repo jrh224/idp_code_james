@@ -321,6 +321,9 @@ void loop() {
   
   delay(10000);
 
+
+
+
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
     if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
       turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
@@ -333,6 +336,10 @@ void loop() {
       numJunctions = 2;
     }
   }
+
+
+
+
   if (status == 1) { //line following to block
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
@@ -345,6 +352,10 @@ void loop() {
       status = 2;
     }
   }
+
+
+
+
   if (status == 2) { // hunting for block along block line
     if (!blockFound){// && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       lineFollow();
@@ -364,13 +375,17 @@ void loop() {
       // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
       // set a timer, if time has gone above a value, block could reverse???
     }
-  
+
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
     if (followPins[2]) {
       status = 3;
       numJunctions = 1;
     }
   }
+
+
+
+
   if (status == 3) { //taking block back to line
     lineFollow();
     if (numJunctions == 0) { // once found line, turn left
@@ -378,7 +393,6 @@ void loop() {
       status = 13;
     }
   }
-
   if (status == 13) {
     if (followPins[1]) {
       status = 4;
@@ -391,9 +405,9 @@ void loop() {
     }
   }
 
-  // CONTINUE HERE
 
   
+
   if (status == 4) { // taking block along line to the correct junction for drop off. 
   //Num Junctions was set in the previous code
     lineFollow();
@@ -408,6 +422,11 @@ void loop() {
       status = 5;
     }
   }
+
+
+
+
+
   if (status == 5) {
     lineFollow();
     if (numJunctions = 0) {
