@@ -248,18 +248,6 @@ void lowerPortalFrame() {
   myservo.write(portalLoweredPos);
 }
 
-void blueBoxDetected(){
-    Serial.println("Blue box detected.");
-    // must count 1 junction to reach the desired drop off spot
-    numJunctions = 1; // count down --> if this value hits 0, then robo must turn at that junction
-}
-
-void brownBoxDetected() {
-    Serial.println("Brown box detected.");
-    // must count 3 junctions to reach the desired drop off spot
-    numJunctions = 3; // count down --> if this value hits 0, then robo must turn at that junction
-}
-
 void detectColour(){
   int brownPin = digitalRead(detectColourPinBrown);
   int bluePin = digitalRead(detectColourPinBlue);
