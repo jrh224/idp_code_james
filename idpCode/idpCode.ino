@@ -50,6 +50,8 @@ bool blockFound = false;
 long durationInDigit, distanceInCm;
 int detectBlockCount = 0;
 int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
+bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
+int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
 
 // for flashing led
 unsigned long previousMillis = 0;  // will store last time LED was updated
@@ -224,10 +226,12 @@ void lineFollow() {
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
   if ((followPins[0]&&followPins[1]) || (followPins[3]&&followPins[2])) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
+    notOnJunctionCount = 0; // if junction detected, then reset the notOnJunctionCounter
     if (currentJunctReadings > (requiredJunctReadings*10)) {
       currentJunctReadings = 0;
-      if (numJunctions > 0) {
+      if (numJunctions > 0 && movedAwayFromLastJunction) { // don't decrement junction code until robot has moved away from last junction i.e. to avoid multiple readings from same junction
         numJunctions --; // only decrement numJunctions if it is greater than zero
+        movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
       }
       Serial.println("Junction detected!");
     }
@@ -235,9 +239,13 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
     currentJunctReadings -= 3;
     }
   }
-  else if ((followPins[0] && !followPins[1]) || (followPins[3] && !followPins[2]))
-  {Serial.println("Strayed from line. Line following no longer correct.");}
-  // need to add code for when just LL or just RR detects a line bc this might be an error
+  else if (!followPins[0] && !followPins[3]) { // only runs when not at a junction of any kind
+    notOnJunctionCount ++;
+    if (notOnJunctionCount > 10) { // if 10 readings indicate the robot has cleared the junction, then it is believable
+      notOnJunctionCount = 0;
+      movedAwayFromLastJunction = true;
+    }
+  }
 }
 // line 160 need to add error correction code for when just LL or just RR detects a line bc this 
 // indicates that line is no longer at centre of robot
@@ -289,9 +297,8 @@ void detectBlock(){
 }
 
 void loop() {
-    //detectColour();
-    //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-    //junctionDetect();
+  takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+  junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
     
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
@@ -401,7 +408,6 @@ void loop() {
   if (status == 5) {
     lineFollow();
     if (numJunctions = 0) {
-      ;
       forwards(); // MOVE FORWARDS A LITTLE BIT MORE
       // LIFT UP PORTAL FRAME
       // REVERSE TO LEAVE BLOCK BEHIND
