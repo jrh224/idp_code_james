@@ -444,7 +444,7 @@ void loop() {
       status = 14;
     }
     }
-  if (status == 14) {
+  if (status == 14) { // check for line while spinning into the turn off zone
     if (followPins[2]) {
       numJunctions = 1;
       status = 5;
@@ -455,12 +455,12 @@ void loop() {
 
 
 
-  if (status == 5) {
+  if (status == 5) { // block drop off algorithm
     lineFollow();
     if (numJunctions = 0) {
-      forwards(); // MOVE FORWARDS A LITTLE BIT MORE
-      raisePortalFrame(); // LIFT UP PORTAL FRAME
-      backwards(); // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing 
+      forwards();
+      raisePortalFrame(); 
+      backwards();
 
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
@@ -468,7 +468,7 @@ void loop() {
     }
   }
 
-    if (status == 15) {
+    if (status == 15) { // spin clockwise 180 degrees until sees the return path from block drop off to main line
     if (followPins[2]) {
       lineFollow();
       numJunctions = 1; // may have to change this value according to if robo detects drop off box
