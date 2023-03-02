@@ -339,7 +339,7 @@ void loop() {
   if (status == 10) { // don't stop spinning until line is found
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
       status = 1;
-      if (currentBlockColour = "brown") {
+      if (currentBlockColour = "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
         numJunctions = 3;
       }
       else if (currentBlockColour = "blue") {
