@@ -353,7 +353,15 @@ void loop() {
   if (status == 10) { // don't stop spinning until line is found
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
       status = 1;
-      numJunctions = 2;
+      if (currentBlockColour = "brown") {
+        numJunctions = 3;
+      }
+      else if (currentBlockColour = "blue") {
+        numJunctions = 1;
+      }
+      else {
+        numJunctions = 2;
+      }
     }
   }
 
@@ -452,7 +460,13 @@ void loop() {
     if (numJunctions = 0) {
       forwards(); // MOVE FORWARDS A LITTLE BIT MORE
       raisePortalFrame(); // LIFT UP PORTAL FRAME
+<<<<<<< HEAD
       backwards(); // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing 
+=======
+
+      // START HERE!!!!      
+      // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing
+>>>>>>> c7bd29bd957fe674b138555f6cc68037a9978962
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
       status = 15;
@@ -469,64 +483,3 @@ void loop() {
 
 
 }
-
-
-
-
-/*
-// variables used in lineFollowPID() function
-int pid_output, P, I, D;
-//int leftMotorSpeed, rightMotorSpeed;
-int error =0; // set this starting to 0 in main loop
-int last_error =0; // set this starting to 0 in main loop
-float Kp, Ki, Kd;
-
-void lineFollowPID(){
-  // must do takeLineReadings() before this function
-  // calculating the error
-  error += followPins[0] * 2 
-                      + followPins[1] * 1
-                      + followPins[2] * -1
-                      + followPins[3] * -2;  // calculating mean for PID
-  //error /= 1; //sensor readings are in range 0-1023, so dividing error by 100 
-  //scales error value to a range of approx -10-10, which is more reasonable
-
-  //if (error * last_error < 0) {I=0;} // if the error crosses 0, then set I
-  // to zero, to remove integral wind up
-
-  // value of kp ki kd is found by testing
-  Kp = 0.05; // proportionality
-  Ki = 0; // integral
-  Kd = 0.0; // derivative
-
-// calculating PID output
-  P = error;
-  I = I + P;
-  D = error - last_error;
-  pid_output = P*Kp + I*Ki + D*Kd;
-  last_error = error;
-
-  // restricting error value between ±50 --> can change this value to fit
-  if (pid_output<-50) {pid_output=-50;}
-  if (pid_output>50) {pid_output=50;}
-
-  Serial.println(pid_output); 
-
-  //pid_output*=0.25;
-  // adjusting speed of each motor by the pid_output
- // if (rightMotorSpeed == speed)
- { 
-  rightMotorSpeed = speed + pid_output; 
-  Serial.println("right motor speed");
-  Serial.println(rightMotorSpeed);}
-
- // if (leftMotorSpeed ==speed)
- { 
-  leftMotorSpeed = speed - pid_output;
-  Serial.println("left motor speed");
-  Serial.println(leftMotorSpeed);}
-  
-  set_motors(leftMotorSpeed, rightMotorSpeed);
-    
-}
-*/
