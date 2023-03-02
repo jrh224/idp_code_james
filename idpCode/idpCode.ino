@@ -460,7 +460,6 @@ void loop() {
     if (numJunctions = 0) {
       forwards(); // MOVE FORWARDS A LITTLE BIT MORE
       raisePortalFrame(); // LIFT UP PORTAL FRAME
-<<<<<<< HEAD
       backwards(); // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing 
 =======
 
@@ -469,14 +468,14 @@ void loop() {
 >>>>>>> c7bd29bd957fe674b138555f6cc68037a9978962
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
-      status = 15;
+      status = 10;
     }
   }
 
     if (status == 15) {
     if (followPins[2]) {
-      //numJunctions = 1;
       lineFollow();
+      numJunctions = 1; // may have to change this value according to if robo detects drop off box
       status = 0;
     }
   }
