@@ -143,19 +143,33 @@ void forwards()
     }  
 }
 
+void backwards()
+{
+  // SET MOTORS TO DRIVE FORWARDS for x seconds
+      Serial.println("Go forward");
+      unsigned long currentTime = millis();
+      if (currentTime - previousTime >= timeMovingForward) 
+    {
+      // save the last time you blinked the LED
+      previousTime = currentTime;
+      // if the LED is off turn it on and vice-versa:
+          motor3->setSpeed(speed);
+          motor3->run(BACKWARD); // consider BACKWARDS if this doesn't work
+          motor4->setSpeed(speed);
+          motor4->run(BACKWARD);
+    }  
+}
+
 void turn(char dir) {
   switch(dir) {
 
     case 'F':
       set_motors(speed, speed);
-
     break;
 
     case 'B':
-    motor3->setSpeed(speed);
-    motor3->run(BACKWARD); // consider BACKWARDS if this doesn't work
-    motor4->setSpeed(speed);
-    motor4->run(BACKWARD);
+      backwards();
+    break;
 
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
@@ -446,20 +460,24 @@ void loop() {
     if (numJunctions = 0) {
       forwards(); // MOVE FORWARDS A LITTLE BIT MORE
       raisePortalFrame(); // LIFT UP PORTAL FRAME
+<<<<<<< HEAD
+      backwards(); // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing 
+=======
 
       // START HERE!!!!      
       // REVERSE TO LEAVE BLOCK BEHIND  - set a timer for reversing
+>>>>>>> c7bd29bd957fe674b138555f6cc68037a9978962
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
-      // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
-      // MOVE FORWARDS UNTIL LINE DETECTED
-      // TURN LEFT
-      if (detection) { // set number of junctions for return journey depending on which block was deposited
-        numJunctions = 1;
-      }
-      else {
-        numJunctions = 3;
-      }
-      status = 1;
+      turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
+      status = 15;
+    }
+  }
+
+    if (status == 15) {
+    if (followPins[2]) {
+      //numJunctions = 1;
+      lineFollow();
+      status = 0;
     }
   }
 
