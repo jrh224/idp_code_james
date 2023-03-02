@@ -44,7 +44,7 @@ int status = 0;
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
-string currentBlockColour = null;
+String currentBlockColour = "";
 // variables for finding block
 bool blockFound = false;
 long durationInDigit, distanceInCm;
@@ -457,7 +457,7 @@ void loop() {
 
   if (status == 5) { // block drop off algorithm
     lineFollow();
-    if (numJunctions = 0) {
+    if (numJunctions == 0) {
       forwards();
       raisePortalFrame(); 
       backwards();
