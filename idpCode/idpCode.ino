@@ -247,6 +247,7 @@ void lineFollow() {
   }
 }
 
+
 void junctionDetect() { // determines whether a junction has ACTUALLY been reached. requiredJunctReadings determines the threshold (I think it's 5?)
   if ((followPins[0]&&followPins[1]) || (followPins[3]&&followPins[2])) { //if all RHS or all LHS sensors detect a line
     currentJunctReadings += 10;
