@@ -26,7 +26,7 @@ const int blockEchoPin = 3; // pin for colour detector
 // initialise servo
 Servo myservo;
 const int portalRaisedPos = 0; // define the lowered and raised servo positions - needs calibrating in final robot
-const int portalLoweredPos = 90;
+const int portalLoweredPos = 45;
 
 // Variables initialised
 int followPins[4];
@@ -332,15 +332,15 @@ void loop() {
     // if the LED is off turn it on and vice-versa:
     flashLED();
   }
-
+/*
   raisePortalFrame();
   Serial.print("raising portal frame");
-  delay(10000);
+  delay(5000);
   lowerPortalFrame();
   Serial.print("Lowering portal frame");
   
-  delay(10000);
-
+  delay(5000);
+*/
 
 
 
