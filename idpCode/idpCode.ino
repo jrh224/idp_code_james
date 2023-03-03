@@ -316,7 +316,7 @@ void detectBlock(){
 }
 
 void loop() {
-  //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+  takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
   //junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
   //lineFollow();  
   unsigned long currentMillis = millis();
@@ -328,6 +328,7 @@ void loop() {
     flashLED();
   }
 
+/*
   raisePortalFrame();
   Serial.print("raising portal frame");
   delay(5000);
@@ -335,7 +336,7 @@ void loop() {
   Serial.print("Lowering portal frame");
   
   delay(5000);
-
+  */
 
 
 /*
