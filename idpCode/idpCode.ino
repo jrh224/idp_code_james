@@ -17,7 +17,7 @@ const int detectColourPinBrown = 6;
 const int detectColourPinBlue = 7; 
 const int followPin1 = 8; //LL
 const int followPin2 = 9; //LC
-const int followPin3 = 10; //RC
+const int followPin3 = 12; //RC - used to be 10
 const int followPin4 = 11; //RR
 const int blockTrigPin = 4; // pin for colour detector 
 const int blockEchoPin = 3; // pin for colour detector
@@ -66,7 +66,7 @@ unsigned long previousTime =0;
 const long timeMovingForward = 5000;
 
 // defining speed of robot
-int speed = 75;
+int speed = 100;
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -74,9 +74,9 @@ int rightMotorSpeed = speed;
 // function to set motor speeds
 void set_motors(int mot3speed, int mot4speed)
 {   motor3->setSpeed(mot3speed);
-    motor3->run(FORWARD);
+    motor3->run(BACKWARD);
     motor4->setSpeed(mot4speed);
-    motor4->run(FORWARD);
+    motor4->run(BACKWARD);
 }
 
 
@@ -152,9 +152,9 @@ void backwards()
       previousTime = currentTime;
       // if the LED is off turn it on and vice-versa:
           motor3->setSpeed(speed);
-          motor3->run(BACKWARD); // consider BACKWARDS if this doesn't work
+          motor3->run(FORWARD); // consider BACKWARDS if this doesn't work
           motor4->setSpeed(speed);
-          motor4->run(BACKWARD);
+          motor4->run(FORWARD);
     }  
 }
 
@@ -230,7 +230,10 @@ void turn(char dir) {
 
 
 void lineFollow() {
-  if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
+  if (followPins[0] || followPins[3]) {
+    turn('F');
+  }
+  else if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
     turn('F'); //move forward
   }
   else if (followPins[1] && !followPins[2]) { //if LC sensor on
@@ -254,6 +257,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
         numJunctions --; // only decrement numJunctions if it is greater than zero
         movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
         Serial.println("Junction detected!");
+        notOnJunctionCount = 0;
       }
     }
     else if (currentJunctReadings > 0) {
@@ -262,9 +266,10 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
   }
   else if (!followPins[0] && !followPins[3]) { // only runs when not at a junction of any kind
     notOnJunctionCount ++;
-    if (notOnJunctionCount > 10) { // if 10 readings indicate the robot has cleared the junction, then it is believable
+    if (notOnJunctionCount > 20000) { // if 10 readings indicate the robot has cleared the junction, then it is believable
       notOnJunctionCount = 0;
       movedAwayFromLastJunction = true;
+      Serial.println("Moved away from junction");
     }
   }
 }
@@ -319,7 +324,7 @@ void detectBlock(){
 void loop() {
   takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
   //junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
-  //lineFollow();  
+  lineFollow();  
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
   {
