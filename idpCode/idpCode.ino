@@ -25,8 +25,8 @@ const int blockEchoPin = 3; // pin for colour detector
 
 // initialise servo
 Servo myservo;
-const int portalRaisedPos = 0; // define the lowered and raised servo positions - needs calibrating in final robot
-const int portalLoweredPos = 45;
+const int portalRaisedPos = 120; // define the lowered and raised servo positions - needs calibrating in final robot
+const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
@@ -122,17 +122,16 @@ void takeLineReadings() {
   followPins[1] = digitalRead(followPin2);
   followPins[2] = digitalRead(followPin3);
   followPins[3] = digitalRead(followPin4);
-
-  for (int i = 0; i < 4; i++) {
-    Serial.print(followPins[i]);
-  }
+  Serial.print(followPins[0]);
+  Serial.print(followPins[1]);
+  Serial.print(followPins[2]);
+  Serial.print(followPins[3]);
   Serial.println();
 }
 
 void forwards()
 {
-  // SET MOTORS TO DRIVE FORWARDS for x seconds
-      Serial.println("Go forward");
+  // SET MOTORS TO DRIVE FORWARDS for x seconds=
       unsigned long currentTime = millis();
       if (currentTime - previousTime >= timeMovingForward) 
     {
@@ -146,7 +145,6 @@ void forwards()
 void backwards()
 {
   // SET MOTORS TO DRIVE FORWARDS for x seconds
-      Serial.println("Go forward");
       unsigned long currentTime = millis();
       if (currentTime - previousTime >= timeMovingForward) 
     {
@@ -174,7 +172,6 @@ void turn(char dir) {
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
-      Serial.println("Turn left");
       leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed 
       rightMotorSpeed = rightMotorSpeed + 0.1*speed; 
       if (rightMotorSpeed >= 255) {rightMotorSpeed=255;}
@@ -185,7 +182,6 @@ void turn(char dir) {
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
-      Serial.println("Turn right");
       leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed
       rightMotorSpeed = rightMotorSpeed - 0.1*speed;
       if (leftMotorSpeed >= 255) {leftMotorSpeed=255;}
@@ -195,7 +191,6 @@ void turn(char dir) {
 
     case 'C':
       // SET MOTORS TO ROTATE CLOCKWISE
-      Serial.println("Rotate clockwise");
             
       leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
@@ -205,7 +200,6 @@ void turn(char dir) {
     
     case 'A':
     // SET MOTORS TO ROTATE ANTICLOCKWISE
-      Serial.println("Rotate anticlockwise");
       rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
@@ -241,9 +235,11 @@ void lineFollow() {
   }
   else if (followPins[1] && !followPins[2]) { //if LC sensor on
     turn('L'); // turn left
+    Serial.println("LC on");
   }
   else if (!followPins[1] && followPins[2]) { //if RC sensor on
     turn('R'); // turn right
+    Serial.println("RC on");
   }
 }
 
@@ -256,8 +252,8 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
       if (numJunctions > 0 && movedAwayFromLastJunction) { // don't decrement junction code until robot has moved away from last junction i.e. to avoid multiple readings from same junction
         numJunctions --; // only decrement numJunctions if it is greater than zero
         movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
+        Serial.println("Junction detected!");
       }
-      Serial.println("Junction detected!");
     }
     else if (currentJunctReadings > 0) {
     currentJunctReadings -= 3;
@@ -277,7 +273,6 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
 // LED flash function for when robot is moving
 void flashLED() {
   movementLEDstate = !movementLEDstate;
-  Serial.print(movementLEDstate);
   digitalWrite(movementLED, movementLEDstate);
 }
 
@@ -321,9 +316,9 @@ void detectBlock(){
 }
 
 void loop() {
-  takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-  junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
-    
+  //takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
+  //junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
+  //lineFollow();  
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
   {
@@ -332,7 +327,7 @@ void loop() {
     // if the LED is off turn it on and vice-versa:
     flashLED();
   }
-/*
+
   raisePortalFrame();
   Serial.print("raising portal frame");
   delay(5000);
@@ -340,17 +335,19 @@ void loop() {
   Serial.print("Lowering portal frame");
   
   delay(5000);
-*/
 
 
 
+/*
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
+    Serial.print("status 0");
     if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
       turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
       status = 10;
     }
   }
   if (status == 10) { // don't stop spinning until line is found
+  Serial.print("status 10");
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
       status = 1;
       if (currentBlockColour = "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
@@ -369,6 +366,7 @@ void loop() {
 
 
   if (status == 1) { //line following to block
+  Serial.print("status 1");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
       turn('r');
@@ -475,6 +473,6 @@ void loop() {
       status = 0;
     }
   }
-
+*/
 
 }
