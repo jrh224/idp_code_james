@@ -162,7 +162,11 @@ void turn(char dir) {
   switch(dir) {
 
     case 'F':
-      set_motors(speed, speed);
+      if (leftMotorSpeed != speed) {
+        leftMotorSpeed = speed;
+        rightMotorSpeed = speed;
+        set_motors(leftMotorSpeed, rightMotorSpeed);
+      }
     break;
 
     case 'B':
@@ -172,21 +176,36 @@ void turn(char dir) {
     case 'L':
       // SET MOTORS TO TURN LEFT IF NOT ALREADY
       // The right hand motor needs to be going faster than left
-      leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed 
+
+      if (rightMotorSpeed == speed) {
+        leftMotorSpeed = 0;
+        rightMotorSpeed = 255;
+        set_motors(leftMotorSpeed, rightMotorSpeed);
+      }
+
+      /*leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed 
       rightMotorSpeed = rightMotorSpeed + 0.1*speed; 
       if (rightMotorSpeed >= 255) {rightMotorSpeed=255;}
       if (leftMotorSpeed <= 0) {leftMotorSpeed=0;}
-      set_motors(leftMotorSpeed, rightMotorSpeed);
+      set_motors(leftMotorSpeed, rightMotorSpeed);*/
       break;
 
     case 'R':
       // SET MOTORS TO TURN RIGHT IF NOT ALREADY
       // The left hand motor needs to be going faster than right
-      leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed
+
+      if (leftMotorSpeed == speed) {
+        leftMotorSpeed = 255;
+        rightMotorSpeed = 0;
+        set_motors(leftMotorSpeed, rightMotorSpeed);
+      }
+
+
+      /*leftMotorSpeed = leftMotorSpeed + 0.1*speed;  // changing wheel speed by 10% of original speed
       rightMotorSpeed = rightMotorSpeed - 0.1*speed;
       if (leftMotorSpeed >= 255) {leftMotorSpeed=255;}
       if (rightMotorSpeed <= 0) {rightMotorSpeed=0;}
-      set_motors(leftMotorSpeed, rightMotorSpeed);
+      set_motors(leftMotorSpeed, rightMotorSpeed); */
       break;
 
     case 'C':
