@@ -249,7 +249,7 @@ void turn(char dir) {
 
 
 void lineFollow() {
-  if (followPins[0] || followPins[3]) {
+  if (followPins[0] || followPins[3]) { // if at a junction, then keep moving forwards with highest priority
     turn('F');
   }
   else if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
