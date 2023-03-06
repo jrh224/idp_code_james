@@ -15,10 +15,10 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(2);
 const int movementLED = 5; // pin for flashing LED when robot is moving
 const int detectColourPinBrown = 6;
 const int detectColourPinBlue = 7; 
-const int followPin1 = 8; //LL
-const int followPin2 = 9; //LC
-const int followPin3 = 12; //RC - used to be 10
-const int followPin4 = 11; //RR
+const int followPin1 = 8; //LL orange
+const int followPin2 = 9; //LC grey
+const int followPin3 = 12; //RC - used to be 10 - white
+const int followPin4 = 11; //RR - purple
 const int blockTrigPin = 4; // pin for colour detector 
 const int blockEchoPin = 3; // pin for colour detector
 
@@ -30,7 +30,7 @@ const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 1; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -63,10 +63,10 @@ const long interval = 50;  // interval at which to blink (milliseconds) - needs 
 
 // for moving forward
 unsigned long previousTime =0;
-const long timeMovingForward = 5000;
+const long timeMovingForward = 1000;
 
 // defining speed of robot
-int speed = 100;
+int speed = 150; //170 seems to be the healthy maximum
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -106,12 +106,12 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  set_motors(speed, speed);
+  set_motors(speed-20, speed); // error correction for mismatched wheels = 10
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
-  motor3->run(RELEASE);
-  motor4->run(RELEASE);
+  motor3->run(BACKWARD);
+  motor4->run(BACKWARD);
 }
 
 
@@ -122,11 +122,11 @@ void takeLineReadings() {
   followPins[1] = digitalRead(followPin2);
   followPins[2] = digitalRead(followPin3);
   followPins[3] = digitalRead(followPin4);
-  Serial.print(followPins[0]);
+  /*Serial.print(followPins[0]);
   Serial.print(followPins[1]);
   Serial.print(followPins[2]);
   Serial.print(followPins[3]);
-  Serial.println();
+  Serial.println();*/
 }
 
 void forwards()
@@ -214,7 +214,7 @@ void turn(char dir) {
       leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
-      set_motors(leftMotorSpeed, rightMotorSpeed);
+      set_motors(rightMotorSpeed, leftMotorSpeed);
       break;
     
     case 'A':
@@ -222,18 +222,19 @@ void turn(char dir) {
       rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
+      set_motors(rightMotorSpeed, leftMotorSpeed);
       break;
 
     case 'l':
       // move forward for x seconds - will have to find x with testing
-      turn('f');
+      //turn('f');
       // then turn(A) until LC finds the line 
       turn('A');
       break;
 
     case 'r':
       // move forward for x seconds - will have to find x with testing
-      turn('f');
+      //turn('f');
       // then turn(A) until LC finds the line 
       turn('C');
 
@@ -257,11 +258,9 @@ void lineFollow() {
   }
   else if (followPins[1] && !followPins[2]) { //if LC sensor on
     turn('L'); // turn left
-    Serial.println("LC on");
   }
   else if (!followPins[1] && followPins[2]) { //if RC sensor on
     turn('R'); // turn right
-    Serial.println("RC on");
   }
 }
 
@@ -276,6 +275,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
         numJunctions --; // only decrement numJunctions if it is greater than zero
         movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
         Serial.println("Junction detected!");
+        Serial.println(numJunctions + " to go");
         notOnJunctionCount = 0;
       }
     }
@@ -342,8 +342,8 @@ void detectBlock(){
 
 void loop() {
   takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
-  //junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
-  lineFollow();  
+  junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
+  //lineFollow();  
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
   {
@@ -364,16 +364,17 @@ void loop() {
   */
 
 
-/*
+
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
-    Serial.print("status 0");
     if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-      turn('l'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
+      delay(1000);
+      turn('A'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
       status = 10;
+      takeLineReadings();
     }
   }
   if (status == 10) { // don't stop spinning until line is found
-  Serial.print("status 10");
+  Serial.println("status 10");
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
       status = 1;
       if (currentBlockColour = "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
@@ -441,7 +442,8 @@ void loop() {
   if (status == 3) { //taking block back to line
     lineFollow();
     if (numJunctions == 0) { // once found line, turn left
-      turn('l');
+      delay(500);
+      turn('C');
       status = 13;
     }
   }
@@ -499,6 +501,6 @@ void loop() {
       status = 0;
     }
   }
-*/
+
 
 }
