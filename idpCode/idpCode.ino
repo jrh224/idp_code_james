@@ -210,7 +210,6 @@ void turn(char dir) {
 
     case 'C':
       // SET MOTORS TO ROTATE CLOCKWISE
-            
       leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
@@ -225,25 +224,7 @@ void turn(char dir) {
       set_motors(rightMotorSpeed, leftMotorSpeed);
       break;
 
-    case 'l':
-      // move forward for x seconds - will have to find x with testing
-      //turn('f');
-      // then turn(A) until LC finds the line 
-      turn('A');
-      break;
 
-    case 'r':
-      // move forward for x seconds - will have to find x with testing
-      //turn('f');
-      // then turn(A) until LC finds the line 
-      turn('C');
-
-      break;
-    
-    case 'f':
-      // SET MOTORS TO DRIVE FORWARDS for x seconds
-      forwards();
-      break;
   }
 
 }
@@ -396,7 +377,7 @@ void loop() {
   Serial.print("status 1");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
-      turn('r');
+      turn('C');
       status = 11;
     }
   }
