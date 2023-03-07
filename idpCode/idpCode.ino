@@ -30,7 +30,7 @@ const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 0;
+int status = 2; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -62,9 +62,10 @@ unsigned long previousMillis = 0;  // will store last time LED was updated
 const long interval = 50;  // interval at which to blink (milliseconds) - needs to be at 20Hz
 
 // for moving forward
-unsigned long previousTime =0;
-const long timeMovingForward = 1000;
-
+/* unsigned long currentT = millis();
+unsigned long previousT =0;
+const long timeMoving = 5000;
+ */
 // defining speed of robot
 int speed = 150; //170 seems to be the healthy maximum
 int leftMotorSpeed = speed;
@@ -163,7 +164,7 @@ void turn(char dir) {
   switch(dir) {
 
     case 'F':
-      if (leftMotorSpeed != speed) {
+      if ((leftMotorSpeed != speed) || rightMotorSpeed != speed) {
         leftMotorSpeed = speed;
         rightMotorSpeed = speed;
         set_motors(leftMotorSpeed, rightMotorSpeed);
@@ -214,11 +215,18 @@ void turn(char dir) {
       break;
 
     case 'C':
+      
       // SET MOTORS TO ROTATE CLOCKWISE
-      leftMotorSpeed = speed;  // may need to change these values according to distance between wheels
+      leftMotorSpeed = 0;
+      rightMotorSpeed = speed;
+      set_motors(leftMotorSpeed, rightMotorSpeed);
+      //delay(100);
+
+      //motor3->setSpeed(speed);  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
-      rightMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
-      set_motors(rightMotorSpeed, leftMotorSpeed);
+      //motor4->setSpeed(0);  // bit extreme to have this at 0, may change with testing
+      //motor3->run(FORWARD);
+      //motor4->run(BACKWARD);
       break;
     
     case 'A':
@@ -331,6 +339,7 @@ void loop() {
   takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
   junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
   //lineFollow();  
+  
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
   {
@@ -354,7 +363,7 @@ void loop() {
 
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
     if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-      delay(1000);
+      //delay(50000);
       turn('A'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
       status = 10;
       takeLineReadings();
@@ -380,16 +389,28 @@ void loop() {
 
 
   if (status == 1) { //line following to block
-  Serial.print("status 1");
+  Serial.print("status 1 ");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
     delay(1000);
-    turn('C');
+    takeLineReadings();
+
+    //turn('C');
+    set_motors(speed, speed);
+    delay(500);
+    // setting this for robo to turn on the spot
+    motor3->setSpeed(speed+50);
+    motor4->setSpeed(speed);  
+    motor3->run(FORWARD); // running backwards
+    motor4->run(BACKWARD); // running forwards
+
     status = 11;
     }
   }
   if (status == 11) { // don't stop spinning until line is found
-    if (followPins[2]) { // once RC pin has seen line, go to status 2 and line follow up to the block
+    if (followPins[0]) { // once RC pin has seen line, go to status 2 and line follow up to the block
+    
+      
       status = 2;
     }
   }
@@ -398,27 +419,31 @@ void loop() {
 
 
   if (status == 2) { // hunting for block along block line
-    if (!blockFound){// && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
-      lineFollow();
-      detectBlock();
+  Serial.print("status 2 ");
+    //if (!blockFound){ // && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
+      //lineFollow();
+      //detectBlock();
       //blockFoundCount ++;
-    }
-    else if (blockFound) { // need distance sensor to determine whether or not block has been found
-      turn('F'); // maybe will need a smaller distance than normal
-      detectColour();
-      lowerPortalFrame();
-      turn('C');
-      status = 12;
-      blockFound=false;
-    }
-    //else {
-      //;
-      // ADD CONTINGENCY FOR IF BLOCK ISN'T FOUND
-      // set a timer, if time has gone above a value, block could reverse???
+    //}
+    //else if (blockFound) { // need distance sensor to determine whether or not block has been found
+      //turn('F'); // maybe will need a smaller distance than normal
+      //detectColour();
+      //lowerPortalFrame();
+      
+      //delay(1000);
+
+      // setting this for robo to turn on the spot
+      motor3->setSpeed(speed+50);
+      motor4->setSpeed(speed);  
+      motor3->run(FORWARD); // running backwards
+      motor4->run(BACKWARD); // running forwards
+      status = 12; // used to be status 12
+      //blockFound=false;
+    //}
     }
 
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
-    if (followPins[2]) {
+    if (followPins[3]) {
       status = 3;
       numJunctions = 1;
     }
@@ -428,10 +453,11 @@ void loop() {
 
 
   if (status == 3) { //taking block back to line
+  Serial.print("status 3 ");
     lineFollow();
-    if (numJunctions == 0) { // once found line, turn left
+    if (numJunctions == 7) { // once found line, turn left, nb numJunctions ideally = 0
       delay(500);
-      turn('C');
+      turn('A');
       status = 13;
     }
   }
@@ -472,9 +498,9 @@ void loop() {
   if (status == 5) { // block drop off algorithm
     lineFollow();
     if (numJunctions == 0) {
-      forwards();
+      turn('F');
       raisePortalFrame(); 
-      backwards();
+      turn('B');
 
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
