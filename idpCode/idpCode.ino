@@ -129,7 +129,7 @@ void takeLineReadings() {
   Serial.println();*/
 }
 
-void forwards()
+/* void forwards()
 {
   // SET MOTORS TO DRIVE FORWARDS for x seconds=
       unsigned long currentTime = millis();
@@ -156,9 +156,10 @@ void backwards()
           motor4->setSpeed(speed);
           motor4->run(FORWARD);
     }  
-}
+} */
 
 void turn(char dir) {
+
   switch(dir) {
 
     case 'F':
@@ -170,7 +171,11 @@ void turn(char dir) {
     break;
 
     case 'B':
-      backwards();
+      if (leftMotorSpeed != speed) {
+        motor3->setSpeed(speed);
+        motor3->run(BACKWARD);
+        motor4->setSpeed(speed);
+        motor4->run(BACKWARD);
     break;
 
     case 'L':
@@ -227,6 +232,7 @@ void turn(char dir) {
 
   }
 
+}
 }
 
 
@@ -377,8 +383,9 @@ void loop() {
   Serial.print("status 1");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
-      turn('C');
-      status = 11;
+    delay(1000);
+    turn('C');
+    status = 11;
     }
   }
   if (status == 11) { // don't stop spinning until line is found
@@ -397,7 +404,7 @@ void loop() {
       //blockFoundCount ++;
     }
     else if (blockFound) { // need distance sensor to determine whether or not block has been found
-      turn('f'); // maybe will need a smaller distance than normal
+      turn('F'); // maybe will need a smaller distance than normal
       detectColour();
       lowerPortalFrame();
       turn('C');
