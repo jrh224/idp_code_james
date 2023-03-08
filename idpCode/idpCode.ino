@@ -54,6 +54,7 @@ bool movedAwayFromLastJunction = true; // variable for junctionDetect() function
 int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
 const int speedAdjustment = 30;
 
+int status1sum = 0;
 
 //
 //int blockFoundCount = 0;
@@ -397,32 +398,25 @@ void loop() {
       motor3->setSpeed(speed);
       motor4->setSpeed(speed);
       motor3->run(FORWARD);
+      motor4->run(FORWARD);
+      delay(500);
+
+      motor3->run(FORWARD);
       motor4->run(BACKWARD);
-      delay(1000);
-      takeLineReadings();
-
-    //set_motors(speed,speed-speedAdjustment);
-    //motor3->run(BACKWARD); // running backwards
-    //motor4->run(BACKWARD);
-    //delay(1000);
-    //takeLineReadings();
-
-    //turn('C');
-    //set_motors(speed, speed);
-    //delay(500);
-    // setting this for robo to turn on the spot
-
-    status = 11;
+      numJunctions = 2;
+      status = 11;
     }
   }
   if (status == 11) { // don't stop spinning until line is found
-      lineFollow();
-    //if (followPins[3]) { // once RC pin has seen line, go to status 2 and line follow up to the block
-    //  turn('F');
-    //  delay(1000);
-      
-    //  status = 2;
+    if (followPins[0]) {
+      status1sum += 1;
+      Serial.print(status1sum);
     }
+    if (status1sum > 10000) {
+      status = 2;
+    }
+    }
+  }
   
 
 
