@@ -443,7 +443,7 @@ void loop() {
     }
 
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
-    if (followPins[3]) {
+    if (followPins[0]) {
       status = 3;
       numJunctions = 1;
     }
