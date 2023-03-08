@@ -410,12 +410,14 @@ void loop() {
   if (status == 11) { // don't stop spinning until line is found
     if (followPins[0]) {
       status1sum += 1;
-      Serial.print(status1sum);
+      Serial.println(status1sum);
     }
-    if (status1sum > 10000) {
+    if (status1sum > 120) {
       status = 2;
+      motor3->run(FORWARD);
+      motor4->run(FORWARD);
     }
-    }
+    
   }
   
 
@@ -423,7 +425,6 @@ void loop() {
 
 
   if (status == 2) { // hunting for block along block line
-  Serial.print("status 2 ");
   lineFollow();
     //if (!blockFound){ // && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       //lineFollow();
