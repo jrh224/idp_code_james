@@ -15,12 +15,12 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(2);
 const int movementLED = 5; // pin for flashing LED when robot is moving
 const int detectColourPinBrown = 6;
 const int detectColourPinBlue = 7; 
-const int followPin1 = 8; //LL orange
-const int followPin2 = 9; //LC grey
-const int followPin3 = 12; //RC - used to be 10 - white
-const int followPin4 = 11; //RR - purple
-const int blockTrigPin = 4; // pin for colour detector 
-const int blockEchoPin = 3; // pin for colour detector
+const int followPin1 = 8; //LL 
+const int followPin2 = 9; //LC 
+const int followPin3 = 11; //RC 
+const int followPin4 = 12; //RR 
+const int blockTrigPin = 4; // distance sensor triger - pink
+const int blockEchoPin = 3; // distance sensor echo - purple
 
 
 // initialise servo
@@ -30,7 +30,7 @@ const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 2; //change back to 0
+int status = 0; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -52,6 +52,8 @@ int detectBlockCount = 0;
 int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
 bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
 int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
+const int speedAdjustment = 30;
+
 
 //
 //int blockFoundCount = 0;
@@ -75,9 +77,9 @@ int rightMotorSpeed = speed;
 // function to set motor speeds
 void set_motors(int mot3speed, int mot4speed)
 {   motor3->setSpeed(mot3speed);
-    motor3->run(BACKWARD);
+    motor3->run(FORWARD);
     motor4->setSpeed(mot4speed);
-    motor4->run(BACKWARD);
+    motor4->run(FORWARD);
 }
 
 
@@ -107,12 +109,12 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  set_motors(speed-20, speed); // error correction for mismatched wheels = 10
+  set_motors(speed, speed-speedAdjustment); // error correction for mismatched wheels = 10
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
-  motor3->run(BACKWARD);
-  motor4->run(BACKWARD);
+  motor3->run(FORWARD);
+  motor4->run(FORWARD);
 }
 
 
@@ -123,11 +125,11 @@ void takeLineReadings() {
   followPins[1] = digitalRead(followPin2);
   followPins[2] = digitalRead(followPin3);
   followPins[3] = digitalRead(followPin4);
-  /*Serial.print(followPins[0]);
+  Serial.print(followPins[0]);
   Serial.print(followPins[1]);
   Serial.print(followPins[2]);
   Serial.print(followPins[3]);
-  Serial.println();*/
+  Serial.println();
 }
 
 /* void forwards()
@@ -363,7 +365,7 @@ void loop() {
 
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
     if (numJunctions == 0) { // when numJunctions hits zero i.e. when the main line is reached
-      //delay(50000);
+      delay(500); // move forwards slightly before spinning anticlockwise
       turn('A'); // (might need to use a different turn function --> need to go forward a bit then turn anticlockwise)
       status = 10;
       takeLineReadings();
@@ -372,7 +374,7 @@ void loop() {
   if (status == 10) { // don't stop spinning until line is found
   Serial.println("status 10");
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
-      status = 1;
+      status = 1; // MAYBE CHANGE TO 2
       if (currentBlockColour = "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
         numJunctions = 3;
       }
