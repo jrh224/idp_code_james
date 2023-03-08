@@ -15,10 +15,10 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(2);
 const int movementLED = 5; // pin for flashing LED when robot is moving
 const int detectColourPinBrown = 6;
 const int detectColourPinBlue = 7; 
-const int followPin1 = 8; //LL 
-const int followPin2 = 9; //LC 
-const int followPin3 = 11; //RC 
-const int followPin4 = 12; //RR 
+const int followPin1 = 8; //LL - white
+const int followPin2 = 9; //LC - purple
+const int followPin3 = 11; //RC - grey (blue sleeve)
+const int followPin4 = 12; //RR - orange
 const int blockTrigPin = 4; // distance sensor triger - pink
 const int blockEchoPin = 3; // distance sensor echo - purple
 
@@ -30,7 +30,7 @@ const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 0; //change back to 0
+int status = 1; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -125,11 +125,11 @@ void takeLineReadings() {
   followPins[1] = digitalRead(followPin2);
   followPins[2] = digitalRead(followPin3);
   followPins[3] = digitalRead(followPin4);
-  Serial.print(followPins[0]);
+  /*Serial.print(followPins[0]);
   Serial.print(followPins[1]);
   Serial.print(followPins[2]);
   Serial.print(followPins[3]);
-  Serial.println();
+  Serial.println();*/
 }
 
 /* void forwards()
@@ -169,7 +169,7 @@ void turn(char dir) {
       if ((leftMotorSpeed != speed) || rightMotorSpeed != speed) {
         leftMotorSpeed = speed;
         rightMotorSpeed = speed;
-        set_motors(leftMotorSpeed, rightMotorSpeed);
+        set_motors(leftMotorSpeed, rightMotorSpeed-speedAdjustment);
       }
     break;
 
@@ -236,7 +236,7 @@ void turn(char dir) {
       rightMotorSpeed = speed;  // may need to change these values according to distance between wheels
       // and radius of curvature i.e. w = v/r = const for all wheels
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
-      set_motors(rightMotorSpeed, leftMotorSpeed);
+      set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
 
 
@@ -394,34 +394,43 @@ void loop() {
   Serial.print("status 1 ");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
-    delay(1000);
-    takeLineReadings();
+      motor3->setSpeed(speed);
+      motor4->setSpeed(speed);
+      motor3->run(FORWARD);
+      motor4->run(BACKWARD);
+      delay(1000);
+      takeLineReadings();
+
+    //set_motors(speed,speed-speedAdjustment);
+    //motor3->run(BACKWARD); // running backwards
+    //motor4->run(BACKWARD);
+    //delay(1000);
+    //takeLineReadings();
 
     //turn('C');
-    set_motors(speed, speed);
-    delay(500);
+    //set_motors(speed, speed);
+    //delay(500);
     // setting this for robo to turn on the spot
-    motor3->setSpeed(speed+50);
-    motor4->setSpeed(speed);  
-    motor3->run(FORWARD); // running backwards
-    motor4->run(BACKWARD); // running forwards
 
     status = 11;
     }
   }
   if (status == 11) { // don't stop spinning until line is found
-    if (followPins[0]) { // once RC pin has seen line, go to status 2 and line follow up to the block
-    
+      lineFollow();
+    //if (followPins[3]) { // once RC pin has seen line, go to status 2 and line follow up to the block
+    //  turn('F');
+    //  delay(1000);
       
-      status = 2;
+    //  status = 2;
     }
-  }
+  
 
 
 
 
   if (status == 2) { // hunting for block along block line
   Serial.print("status 2 ");
+  lineFollow();
     //if (!blockFound){ // && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       //lineFollow();
       //detectBlock();
@@ -435,11 +444,11 @@ void loop() {
       //delay(1000);
 
       // setting this for robo to turn on the spot
-      motor3->setSpeed(speed+50);
-      motor4->setSpeed(speed);  
-      motor3->run(FORWARD); // running backwards
-      motor4->run(BACKWARD); // running forwards
-      status = 12; // used to be status 12
+      //motor3->setSpeed(speed+50);
+      //motor4->setSpeed(speed);  
+      //motor3->run(FORWARD); // running backwards
+      //motor4->run(BACKWARD); // running forwards
+      //status = 12; // used to be status 12
       //blockFound=false;
     //}
     }
