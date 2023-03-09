@@ -16,7 +16,7 @@ const int movementLED = 5; // pin for flashing LED when robot is moving
 const int detectColourPinBrown = 6;
 const int detectColourPinBlue = 7; 
 const int followPin1 = 8; //LL - white
-const int followPin2 = 9; //LC - purple
+const int followPin2 = 13; //LC - purple - was in 9
 const int followPin3 = 11; //RC - grey (blue sleeve)
 const int followPin4 = 12; //RR - orange
 const int blockTrigPin = 4; // distance sensor triger - pink
@@ -30,7 +30,7 @@ const int portalLoweredPos = 75;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 1; //change back to 0
+int status = 0; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -52,7 +52,7 @@ int detectBlockCount = 0;
 int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
 bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
 int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
-const int speedAdjustment = 30;
+const int speedAdjustment = 30; // 30 for comp
 
 int status1sum = 0;
 
@@ -70,7 +70,7 @@ unsigned long previousT =0;
 const long timeMoving = 5000;
  */
 // defining speed of robot
-int speed = 150; //170 seems to be the healthy maximum
+int speed = 170; //150 before
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -273,7 +273,7 @@ void junctionDetect() { // determines whether a junction has ACTUALLY been reach
         numJunctions --; // only decrement numJunctions if it is greater than zero
         movedAwayFromLastJunction = false; // to avoid repeat readings of same junction
         Serial.println("Junction detected!");
-        Serial.println(numJunctions + " to go");
+        Serial.println(numJunctions);
         notOnJunctionCount = 0;
       }
     }
@@ -352,6 +352,7 @@ void loop() {
     flashLED();
   }
 
+
 /*
   raisePortalFrame();
   Serial.print("raising portal frame");
@@ -373,18 +374,19 @@ void loop() {
     }
   }
   if (status == 10) { // don't stop spinning until line is found
-  Serial.println("status 10");
+  //Serial.println("status 10");
     if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
       status = 1; // MAYBE CHANGE TO 2
-      if (currentBlockColour = "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
+      Serial.println(currentBlockColour);
+      if (currentBlockColour == "brown") { // set the number of junctions depending on whether the robot is just starting, or if it has just dropped off a block
         numJunctions = 3;
       }
-      else if (currentBlockColour = "blue") {
+      else if (currentBlockColour == "blue") {
         numJunctions = 1;
       }
       else {
         numJunctions = 2;
-      }
+      } 
     }
   }
 
@@ -392,9 +394,10 @@ void loop() {
 
 
   if (status == 1) { //line following to block
-  Serial.print("status 1 ");
+  //Serial.print("status 1 ");
     lineFollow(); //run line follower algorithm
     if (numJunctions == 0) { // turn once at correct junction
+    Serial.println("found correct junction");
       motor3->setSpeed(speed);
       motor4->setSpeed(speed);
       motor3->run(FORWARD);
@@ -402,6 +405,8 @@ void loop() {
       delay(500);
 
       motor3->run(FORWARD);
+      rightMotorSpeed = speed+20;
+      motor4->setSpeed(rightMotorSpeed);
       motor4->run(BACKWARD);
       numJunctions = 2;
       status = 11;
@@ -425,7 +430,15 @@ void loop() {
 
 
   if (status == 2) { // hunting for block along block line
-  lineFollow();
+    lineFollow();
+    if (distanceInCm < 2) { // maybe change to 1 ? unsure
+      turn('F');
+      delay(2000);
+      motor3->run(RELEASE);
+      motor4->run(RELEASE);
+      status = 12;
+    }
+
     //if (!blockFound){ // && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
       //lineFollow();
       //detectBlock();
