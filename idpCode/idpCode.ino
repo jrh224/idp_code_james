@@ -394,14 +394,15 @@ void loop() {
   if (status == 1) { //line following to block
   Serial.print("status 1 ");
     lineFollow(); //run line follower algorithm
-    if (numJunctions == 0) { // turn once at correct junction
-      motor3->setSpeed(speed);
+    if (numJunctions == 0) { // at correct junction
+
+      motor3->setSpeed(speed); // moving forward for a delay of 500
       motor4->setSpeed(speed);
       motor3->run(FORWARD);
       motor4->run(FORWARD);
       delay(500);
 
-      motor3->run(FORWARD);
+      motor3->run(FORWARD); // turning
       motor4->run(BACKWARD);
       numJunctions = 2;
       status = 11;
