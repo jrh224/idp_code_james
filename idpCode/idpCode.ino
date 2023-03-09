@@ -25,12 +25,12 @@ const int blockEchoPin = 3; // distance sensor echo - purple
 
 // initialise servo
 Servo myservo;
-const int portalRaisedPos = 120; // define the lowered and raised servo positions - needs calibrating in final robot
-const int portalLoweredPos = 75;
+const int portalRaisedPos = 170; // define the lowered and raised servo positions - needs calibrating in final robot
+const int portalLoweredPos = 115;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 0; //change back to 0
+int status = 1; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -116,6 +116,7 @@ void setup() {
   //motor2->run(RELEASE);
   motor3->run(FORWARD);
   motor4->run(FORWARD);
+  raisePortalFrame();
 }
 
 
@@ -436,6 +437,15 @@ void loop() {
       delay(2000);
       motor3->run(RELEASE);
       motor4->run(RELEASE);
+      detectColour();
+      Serial.println(currentBlockColour);
+      lowerPortalFrame();
+      delay(500);
+      leftMotorSpeed = 0;
+      rightMotorSpeed = speed;
+      motor3->setSpeed(leftMotorSpeed);
+      motor4->setSpeed(rightMotorSpeed);
+      motor4->run(BACKWARD);
       status = 12;
     }
 
@@ -462,7 +472,7 @@ void loop() {
     }
 
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
-    if (followPins[0]) {
+    if (followPins[1]) {
       status = 3;
       numJunctions = 1;
     }
