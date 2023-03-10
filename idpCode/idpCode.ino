@@ -84,6 +84,16 @@ void set_motors(int mot3speed, int mot4speed)
     motor4->run(FORWARD);
 }
 
+// function for lifting portal frame
+void raisePortalFrame() {
+  myservo.write(portalRaisedPos);
+}
+
+//function for lowering portal frame
+void lowerPortalFrame() {
+  myservo.write(portalLoweredPos);
+}
+
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -177,7 +187,6 @@ void turn(char dir) {
     break;
 
     case 'B':
-      if (leftMotorSpeed != speed) {
         motor3->setSpeed(speed);
         motor3->run(BACKWARD);
         motor4->setSpeed(speed);
@@ -246,7 +255,7 @@ void turn(char dir) {
   }
 
 }
-}
+
 
 
 void lineFollow() {
@@ -301,15 +310,7 @@ void flashLED() {
   digitalWrite(movementLED, movementLEDstate);
 }
 
-// function for lifting portal frame
-void raisePortalFrame() {
-  myservo.write(portalRaisedPos);
-}
 
-//function for lowering portal frame
-void lowerPortalFrame() {
-  myservo.write(portalLoweredPos);
-}
 
 void detectColour(){
   int brownPin = digitalRead(detectColourPinBrown);
@@ -516,7 +517,6 @@ void loop() {
     }
 
     if (status3sum > 80) {
-      status = 4;
       leftMotorSpeed = speed+30;
       rightMotorSpeed = speed;
       motor3->setSpeed(leftMotorSpeed);
@@ -531,8 +531,11 @@ void loop() {
       raisePortalFrame();
       delay(500);
 
+      leftMotorSpeed = speed;
+      rightMotorSpeed = speed;
       turn('B');
-      
+
+      status = 4;
 
       if (currentBlockColour = "blue") {
         numJunctions = 1;
@@ -546,27 +549,46 @@ void loop() {
   }
 
 
+  if (status == 4) {
+    Serial.println(status);
+     if (followPins[3])
+      {
+        turn('F');
+        delay(100);
+        leftMotorSpeed = speed+40;
+        rightMotorSpeed = speed;
+        motor3->setSpeed(leftMotorSpeed);
+        motor4->setSpeed(rightMotorSpeed);
+        motor3->run(FORWARD);
+        motor4->run(BACKWARD);
+        status = 15;
+      }
+  }
 
 
+/*   if (status == 5) { // block drop off algorithm
 
-  if (status == 5) { // block drop off algorithm
-    lineFollow();
-    if (numJunctions == 0) {
+    if (followPins[2])
+    {
+      status = 15;
+    } */
+ /*    if (numJunctions == 0) {
       turn('F');
       raisePortalFrame(); 
       turn('B');
 
       // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
       turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
-      status = 10;
-    }
+      status = 10; 
+    }*/
   }
 
     if (status == 15) { // spin clockwise 180 degrees until sees the return path from block drop off to main line
+    Serial.println(status);
     if (followPins[2]) {
-      lineFollow();
-      numJunctions = 1; // may have to change this value according to if robo detects drop off box
-      status = 0;
+      //lineFollow();
+      //numJunctions = 1; // may have to change this value according to if robo detects drop off box
+      status = 1;
     }
   }
 
