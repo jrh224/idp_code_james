@@ -570,7 +570,7 @@ void loop() {
 
     if (status == 15) { // spin clockwise 180 degrees until sees the return path from block drop off to main line
     Serial.println(status);
-    if (followPins[2]) {
+    if (followPins[2]) { // FOR MONDAY - THE NUMBER OF JUNCTIONS CODE IS RUNNING AS IT IS SPINNING AND SO IT IS GETTING TRIGGERED AND THINKING ITS PASSED A JUNCTION. NEED TO SET THE NUMJUNCTIONS VARIABLE *AFTER* THE ROBOT HAS STARTED LINE FOLLOWING BACK TO THE BLOCK
       //lineFollow();
       //numJunctions = 1; // may have to change this value according to if robo detects drop off box
       status = 1;
