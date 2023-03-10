@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 1; //change back to 0
+int status = 3; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -55,6 +55,7 @@ int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunc
 const int speedAdjustment = 30; // 30 for comp
 
 int status1sum = 0;
+int status3sum = 0;
 
 //
 //int blockFoundCount = 0;
@@ -397,27 +398,17 @@ void loop() {
   if (status == 1) { //line following to block
   //Serial.print("status 1 ");
     lineFollow(); //run line follower algorithm
-<<<<<<< HEAD
-    if (numJunctions == 0) { // at correct junction
-
-      motor3->setSpeed(speed); // moving forward for a delay of 500
-=======
     if (numJunctions == 0) { // turn once at correct junction
     Serial.println("found correct junction");
       motor3->setSpeed(speed);
->>>>>>> afea059f752e7aeb0793d25d60ea78379c72ba38
       motor4->setSpeed(speed);
       motor3->run(FORWARD);
       motor4->run(FORWARD);
       delay(500);
 
-<<<<<<< HEAD
-      motor3->run(FORWARD); // turning
-=======
       motor3->run(FORWARD);
       rightMotorSpeed = speed+20;
       motor4->setSpeed(rightMotorSpeed);
->>>>>>> afea059f752e7aeb0793d25d60ea78379c72ba38
       motor4->run(BACKWARD);
       numJunctions = 2;
       status = 11;
@@ -494,40 +485,64 @@ void loop() {
   if (status == 3) { //taking block back to line
   Serial.print("status 3 ");
     lineFollow();
-    if (numJunctions == 7) { // once found line, turn left, nb numJunctions ideally = 0
+    Serial.println(numJunctions);
+    if (numJunctions == 0) { // once found line, turn right
+      
+      // go forward a little bit
+      motor3->setSpeed(speed);
+      motor4->setSpeed(speed);
+      motor3->run(FORWARD);
+      motor4->run(FORWARD);
       delay(500);
-      turn('A');
+
+      // rotate clockwise 
+      //leftMotorSpeed = speed-20;
+      //motor3->setSpeed(leftMotorSpeed);
+      //motor3->run(FORWARD);
+      rightMotorSpeed = speed+50;
+      motor4->setSpeed(rightMotorSpeed);
+      motor4->run(BACKWARD);
+
       status = 13;
     }
+
+
   }
   if (status == 13) {
-    if (followPins[1]) {
+
+    if (followPins[0]) {
+      status3sum += 1;
+      Serial.println(status3sum);
+    }
+
+    if (status3sum > 80) {
       status = 4;
+      leftMotorSpeed = speed+30;
+      rightMotorSpeed = speed;
+      motor3->setSpeed(leftMotorSpeed);
+      motor4->setSpeed(rightMotorSpeed);
+      motor3->run(FORWARD);
+      motor4->run(FORWARD);
+
+      delay(2000);
+      motor3->run(RELEASE);
+      motor4->run(RELEASE);
+
+      raisePortalFrame();
+      delay(500);
+
+      turn('B');
+      
+
       if (currentBlockColour = "blue") {
         numJunctions = 1;
       }
       else {
-        numJunctions = 3;
-      }
+        numJunctions = 3;}
     }
-  }
 
 
-  
 
-  if (status == 4) { // taking block along line to the correct junction for drop off. 
-  //Num Junctions was set in the previous code
-    lineFollow();
-    if (numJunctions == 0) {
-      turn('r');
-      status = 14;
-    }
-    }
-  if (status == 14) { // check for line while spinning into the turn off zone
-    if (followPins[2]) {
-      numJunctions = 1;
-      status = 5;
-    }
   }
 
 
