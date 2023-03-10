@@ -555,6 +555,7 @@ void loop() {
       {
         turn('F');
         delay(100);
+        
         leftMotorSpeed = speed+40;
         rightMotorSpeed = speed;
         motor3->setSpeed(leftMotorSpeed);
@@ -566,22 +567,6 @@ void loop() {
   }
 
 
-/*   if (status == 5) { // block drop off algorithm
-
-    if (followPins[2])
-    {
-      status = 15;
-    } */
- /*    if (numJunctions == 0) {
-      turn('F');
-      raisePortalFrame(); 
-      turn('B');
-
-      // KEEP REVERSING UNTIL THE EDGE OF THE BLOCK IS FOUND – could reverse for x seconds?
-      turn('C'); // TURN 180 DEGREES - turn clockwise until one of the middle 2 sensors detects a line, 
-      status = 10; 
-    }*/
-  }
 
     if (status == 15) { // spin clockwise 180 degrees until sees the return path from block drop off to main line
     Serial.println(status);
