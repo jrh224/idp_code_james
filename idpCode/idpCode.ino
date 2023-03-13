@@ -25,12 +25,12 @@ const int blockEchoPin = 3; // distance sensor echo - purple
 
 // initialise servo
 Servo myservo;
-const int portalRaisedPos = 170; // define the lowered and raised servo positions - needs calibrating in final robot
-const int portalLoweredPos = 115;
+const int portalRaisedPos = 115; // was 170
+const int portalLoweredPos = 50;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +40,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 0; //change back to 0
+int status = 1; //change back to 0
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -52,7 +52,7 @@ int detectBlockCount = 0;
 int threshholdBlockDistance = 5; // distance in cm from block, at which point we can say blockFound=true
 bool movedAwayFromLastJunction = true; // variable for junctionDetect() function that will avoid repeat readings from same junction
 int notOnJunctionCount = 0; // to ensure that the variable movedAwayFromLastJunction is only reset when the robot has sufficiently cleared the last junction
-const int speedAdjustment = 30; // 30 for comp
+const int speedAdjustment = 25; // 30 for comp - might need to change for different speeds
 
 int status1sum = 0;
 int status3sum = 0;
@@ -71,7 +71,7 @@ unsigned long previousT =0;
 const long timeMoving = 5000;
  */
 // defining speed of robot
-int speed = 170; //150 before
+int speed = 170; //170 before
 int leftMotorSpeed = speed;
 int rightMotorSpeed = speed;
 
@@ -127,7 +127,7 @@ void setup() {
   //motor2->run(RELEASE);
   motor3->run(FORWARD);
   motor4->run(FORWARD);
-  raisePortalFrame();
+  raisePortalFrame(); //raise portal frame
 }
 
 
@@ -344,7 +344,6 @@ void detectBlock(){
 void loop() {
   takeLineReadings(); //Default behaviour is to take line readings and follow line accordingly
   junctionDetect(); // maybe consider that this could cause bugs if outer line sensors are over the white line before it starts line following
-  //lineFollow();  
   
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) 
@@ -422,6 +421,7 @@ void loop() {
     }
     if (status1sum > 120) {
       status = 2;
+      status1sum = 0;
       motor3->run(FORWARD);
       motor4->run(FORWARD);
     }
@@ -439,8 +439,8 @@ void loop() {
       delay(2000);
       motor3->run(RELEASE);
       motor4->run(RELEASE);
+      delay(5000);
       detectColour();
-      Serial.println(currentBlockColour);
       lowerPortalFrame();
       delay(500);
       leftMotorSpeed = 0;
@@ -488,10 +488,10 @@ void loop() {
 
 
 
-  if (status == 3) { //taking block back to line
-  Serial.print("status 3 ");
+  if (status == 3) { //following line back to other side of board
+  //Serial.print("status 3 ");
     lineFollow();
-    Serial.println(numJunctions);
+    //Serial.println(numJunctions);
     if (numJunctions == 0) { // once found line, turn right
       
       // go forward a little bit
@@ -514,7 +514,7 @@ void loop() {
 
 
   }
-  if (status == 13) {
+  if (status == 13) { // drop off block in square
 
     if (followPins[0]) {
       status3sum += 1;
@@ -522,6 +522,7 @@ void loop() {
     }
 
     if (status3sum > 80) {
+      status3sum = 0;
       leftMotorSpeed = speed+30;
       rightMotorSpeed = speed;
       motor3->setSpeed(leftMotorSpeed);
@@ -533,20 +534,22 @@ void loop() {
       motor3->run(RELEASE);
       motor4->run(RELEASE);
 
-      raisePortalFrame();
+      raisePortalFrame(); //drop off block moment
+      delay(500);
+      turn('B'); // reverse a bit
       delay(500);
 
-      leftMotorSpeed = speed;
+      leftMotorSpeed = 0; // pivot around left wheel backwards
       rightMotorSpeed = speed;
-      turn('B');
+      motor3->setSpeed(leftMotorSpeed);
+      motor4->setSpeed(rightMotorSpeed);
+      motor3->run(FORWARD);
+      motor4->run(BACKWARD);
+      delay(1000);
 
-      status = 4;
 
-      if (currentBlockColour = "blue") {
-        numJunctions = 1;
-      }
-      else {
-        numJunctions = 3;}
+      status = 15;
+
     }
 
 
@@ -554,30 +557,24 @@ void loop() {
   }
 
 
-  if (status == 4) {
+  /*if (status == 4) { // ignore for now
     Serial.println(status);
-     if (followPins[3])
+     if (followPins[2])
       {
-        turn('F');
-        delay(100);
-        
-        leftMotorSpeed = speed+40;
-        rightMotorSpeed = speed;
-        motor3->setSpeed(leftMotorSpeed);
-        motor4->setSpeed(rightMotorSpeed);
-        motor3->run(FORWARD);
-        motor4->run(BACKWARD);
-        status = 15;
+        status = 1;
       }
   }
+*/
 
 
-
-    if (status == 15) { // spin clockwise 180 degrees until sees the return path from block drop off to main line
-    Serial.println(status);
+    if (status == 15) { // spin clockwise until sees the return path from block drop off to main line
+    //Serial.println(status);
     if (followPins[2]) { // FOR MONDAY - THE NUMBER OF JUNCTIONS CODE IS RUNNING AS IT IS SPINNING AND SO IT IS GETTING TRIGGERED AND THINKING ITS PASSED A JUNCTION. NEED TO SET THE NUMJUNCTIONS VARIABLE *AFTER* THE ROBOT HAS STARTED LINE FOLLOWING BACK TO THE BLOCK
-      //lineFollow();
-      //numJunctions = 1; // may have to change this value according to if robo detects drop off box
+      if (currentBlockColour == "brown") {
+        numJunctions = 3;
+      }
+      else {
+        numJunctions = 1;}
       status = 1;
     }
   }
