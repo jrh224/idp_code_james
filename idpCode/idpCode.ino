@@ -21,6 +21,7 @@ const int followPin3 = 11; //RC - grey (blue sleeve)
 const int followPin4 = 12; //RR - orange
 const int blockTrigPin = 4; // distance sensor triger - pink
 const int blockEchoPin = 3; // distance sensor echo - purple
+const int buttonPin = 2;
 
 
 // initialise servo
@@ -30,7 +31,7 @@ const int portalLoweredPos = 50;
 
 // Variables initialised
 int followPins[4];
-int numJunctions = 1; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
+int numJunctions = 2; //change back to 2; // count down --> if robo reaches a junction and this value is 0, then robo must turn at that junction
 // initially (when in the start box), robo must detect 2 junctions
 int detection; // value for colour detected
 // define number of readings in the last 5 for a junction before action is taken
@@ -40,7 +41,7 @@ int currentJunctReadings = 0;
 // define next turn direction
 char nextTurn = 'L';
 // variable for robot's current goal
-int status = 1; //change back to 0
+int status = 100; // set back to 100 - this is waiting for button to be pressed
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
@@ -107,6 +108,7 @@ void setup() {
   pinMode(movementLED, OUTPUT); // set flashing LED pin as output
   pinMode(blockTrigPin, OUTPUT);
   pinMode(blockEchoPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP); // for button pin
 // attach servo object to pin 10 (maybe is pin 9?)
   myservo.attach(10);
 
@@ -125,8 +127,8 @@ void setup() {
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
-  motor3->run(FORWARD);
-  motor4->run(FORWARD);
+  motor3->run(RELEASE);
+  motor4->run(RELEASE);
   raisePortalFrame(); //raise portal frame
 }
 
@@ -365,6 +367,13 @@ void loop() {
   delay(5000);
   */
 
+if (status == 100) {
+  if (!digitalRead(buttonPin)) { // if the button is pressed, then start the rest of the code
+    motor3->run(FORWARD);
+    motor4->run(FORWARD);
+    status = 0;
+  }
+}
 
 
   if (status == 0) { // start sequence - make sure wheels are initially set to move forwards in the setup
