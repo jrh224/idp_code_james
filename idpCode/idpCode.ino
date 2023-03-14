@@ -45,7 +45,13 @@ int status = 100; // set back to 100 - this is waiting for button to be pressed
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
-String currentBlockColour = "";
+String currentBlockColour = ""; 
+
+// variable for counting the num of blocks that have been collected
+int numBlocksCollected = 0; 
+// variable for max number of blocks to collected within 5min limit (set to 2 after timing the blocks)
+int maxNumBlocks = 2; 
+
 // variables for finding block
 bool blockFound = false;
 long durationInDigit, distanceInCm;
@@ -466,29 +472,15 @@ if (status == 100) {
       motor3->setSpeed(leftMotorSpeed);
       motor4->setSpeed(rightMotorSpeed);
       motor4->run(BACKWARD);
+
+      numBlocksCollected ++; // increasing numBlocksCollected
+
       status = 12;
     }
 
-    //if (!blockFound){ // && blockFoundCount < maxBlockFoundCount) { // use distance sensor to determine whether or not block has been found
-      //lineFollow();
-      //detectBlock();
-      //blockFoundCount ++;
-    //}
-    //else if (blockFound) { // need distance sensor to determine whether or not block has been found
-      //turn('F'); // maybe will need a smaller distance than normal
-      //detectColour();
-      //lowerPortalFrame();
-      
-      //delay(1000);
 
-      // setting this for robo to turn on the spot
-      //motor3->setSpeed(speed+50);
-      //motor4->setSpeed(speed);  
-      //motor3->run(FORWARD); // running backwards
-      //motor4->run(BACKWARD); // running forwards
-      //status = 12; // used to be status 12
-      //blockFound=false;
-    //}
+
+
     }
 
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
@@ -570,33 +562,54 @@ if (status == 100) {
       status = 15;
 
     }
-
-
-
   }
 
-
-  /*if (status == 4) { // ignore for now
-    Serial.println(status);
-     if (followPins[2])
-      {
-        status = 1;
-      }
-  }
-*/
 
 
     if (status == 15) { // spin clockwise until sees the return path from block drop off to main line
     //Serial.println(status);
-    if (followPins[2]) { // FOR MONDAY - THE NUMBER OF JUNCTIONS CODE IS RUNNING AS IT IS SPINNING AND SO IT IS GETTING TRIGGERED AND THINKING ITS PASSED A JUNCTION. NEED TO SET THE NUMJUNCTIONS VARIABLE *AFTER* THE ROBOT HAS STARTED LINE FOLLOWING BACK TO THE BLOCK
-      if (currentBlockColour == "brown") {
-        numJunctions = 3;
+      if (followPins[2]) { // FOR MONDAY - THE NUMBER OF JUNCTIONS CODE IS RUNNING AS IT IS SPINNING AND SO IT IS GETTING TRIGGERED AND THINKING ITS PASSED A JUNCTION. NEED TO SET THE NUMJUNCTIONS VARIABLE *AFTER* THE ROBOT HAS STARTED LINE FOLLOWING BACK TO THE BLOCK
+        if (currentBlockColour == "brown" && (numBlocksCollected<maxNumBlocks)) {
+          numJunctions = 3;
+          status = 1;
+        }
+        else if (currentBlockColour == "blue" && (numBlocksCollected<maxNumBlocks)) {
+          numJunctions = 1;
+          status = 1;
+        }
+        else if ((currentBlockColour == "brown") && (numBlocksCollected==maxNumBlocks)){
+          numJunctions = 1;
+          status = 6;
+        }
+        else if ((currentBlockColour == "blue") && (numBlocksCollected==maxNumBlocks)){
+          leftMotorSpeed = speed; // pivot around right wheel (want to reverse direction of robot)
+          rightMotorSpeed = 0;
+          motor3->setSpeed(leftMotorSpeed);
+          motor4->setSpeed(rightMotorSpeed);
+          motor3->run(BACKWARD);
+          motor4->run(FORWARD);
+          status = 7;
+        }
       }
-      else {
-        numJunctions = 1;}
-      status = 1;
     }
-  }
 
+
+    if (status == 7) {  // if last block colour was blue, carry on rotating clockwise until line is found (i.e. have changed direction of robot)
+      if (followPins[2]) {
+        status = 8;
+      }
+    }
+
+
+    if (status == 6) {  // if last block colour was brown and now returning to the start box
+        if ( numJunctions== 0) {
+          // TURN RIGHT INTO START BOX THEN STOP MOVING
+        }
+    }
+
+
+    if (status == 8) { // if last block colour was blue and now returning to start box
+      
+    }
 
 }
