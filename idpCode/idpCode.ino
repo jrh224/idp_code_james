@@ -595,13 +595,23 @@ if (status == 100) {
     }
 
 
-    if (status == 6) {  // if last block colour was brown and now returning to the start box
+    if (status == 6) {  // status for when last block colour was brown and now returning to the start box
         if ( numJunctions== 0) {
-          // TURN left
-          // move forward INTO START BOX 
-          // THEN STOP MOVING
+          delay(500); // move forwards slightly before spinning anticlockwise
+          turn('A'); // turn left / anticlockwise
+          status = 9;
         }
     }
+
+
+
+  if (status == 10) { // don't stop spinning until line is found
+  //Serial.println("status 10");
+    if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
+      status = 1; // MAYBE CHANGE TO 2
+
+
+
 
 
     if (status == 7) {  // if last block colour was blue, carry on rotating clockwise until line is found (i.e. have changed direction of robot)
@@ -609,12 +619,42 @@ if (status == 100) {
         status = 8;
       }
     }
-
-    if (status == 8) { // if last block colour was blue and now returning to start box
-      if ( numJunctions== 0) {
-          // TURN right
-          // move forward INTO START BOX 
-          // THEN STOP MOVING
+    if (status == 8) { // status for when last block colour was blue and now returning to start box
+      if (numJunctions== 0) {
+        delay(500);
+        turn('C'); // TURN right / clockwise
+          status = 9;
         }
+    }
+
+
+
+
+    if (status == 9) { // status for stopping the rotation
+      if(followPins[1] || followPins[2]){
+        lineFollow();
+        status = 99; 
+        } // line follow until detect outline of box
+    }
+
+
+
+
+
+    if (status == 99) { // status to move into and stop in the start box
+      if (followPins[0] || followPins[3]){ // when detect another junction / or when all 4 sensors detect something
+      // move forward for x seconds 
+      leftMotorSpeed = speed;
+      rightMotorSpeed = speed;
+      motor3->setSpeed(leftMotorSpeed);
+      motor4->setSpeed(rightMotorSpeed);
+      motor3->run(FORWARD);
+      motor4->run(FORWARD);
+      delay(3000); // may have to change this delay after testing how long it takes for robot to fit in box
+      motor3->run(RELEASE);
+      motor4->run(RELEASE); // stop moving
+      }
+      
+    }
 
 }
