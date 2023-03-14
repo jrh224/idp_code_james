@@ -595,6 +595,10 @@ if (status == 100) {
     }
 
 
+
+
+
+
     if (status == 6) {  // status for when last block colour was brown and now returning to the start box
         if ( numJunctions== 0) {
           delay(500); // move forwards slightly before spinning anticlockwise
@@ -602,13 +606,13 @@ if (status == 100) {
           status = 9;
         }
     }
+        if (status == 9) { // status for stopping the rotation
+      if(followPins[1]){
+        lineFollow();
+        status = 99; 
+        } // line follow until detect outline of box
+    }
 
-
-
-  if (status == 10) { // don't stop spinning until line is found
-  //Serial.println("status 10");
-    if (followPins[1]) { // once the LC pin has found the line, set the right number of junctions then go to status 1 where the robot will begin to line follow normally
-      status = 1; // MAYBE CHANGE TO 2
 
 
 
@@ -623,19 +627,18 @@ if (status == 100) {
       if (numJunctions== 0) {
         delay(500);
         turn('C'); // TURN right / clockwise
-          status = 9;
+          status = 98;
         }
     }
 
-
-
-
-    if (status == 9) { // status for stopping the rotation
-      if(followPins[1] || followPins[2]){
+    if (status == 98) { // status for stopping the rotation
+      if(followPins[2]){
         lineFollow();
         status = 99; 
         } // line follow until detect outline of box
     }
+
+
 
 
 
