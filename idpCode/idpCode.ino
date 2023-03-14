@@ -127,7 +127,7 @@ void setup() {
   // turn off motors
   //motor1->run(RELEASE);
   //motor2->run(RELEASE);
-  motor3->run(RELEASE);
+  motor3->run(RELEASE); // change back to release after!
   motor4->run(RELEASE);
   raisePortalFrame(); //raise portal frame
 }
@@ -200,9 +200,10 @@ void turn(char dir) {
       // The right hand motor needs to be going faster than left
 
       if (rightMotorSpeed == speed) {
-        leftMotorSpeed = 0;
+        leftMotorSpeed = 10;
         rightMotorSpeed = 255;
         set_motors(leftMotorSpeed, rightMotorSpeed);
+        motor3->run(BACKWARD);
       }
 
       /*leftMotorSpeed = leftMotorSpeed - 0.1*speed; // changing wheel speed by 10% of original speed 
@@ -218,8 +219,9 @@ void turn(char dir) {
 
       if (leftMotorSpeed == speed) {
         leftMotorSpeed = 255;
-        rightMotorSpeed = 0;
+        rightMotorSpeed = 10;
         set_motors(leftMotorSpeed, rightMotorSpeed);
+        motor4->run(BACKWARD);
       }
 
 
@@ -261,7 +263,14 @@ void turn(char dir) {
 
 
 void lineFollow() {
-  if (followPins[0] || followPins[3]) { // if at a junction, then keep moving forwards with highest priority
+  if (followPins[1] && followPins[2] && followPins[3] && !followPins[0]) {
+    if (rightMotorSpeed == speed || leftMotorSpeed == speed) {
+        leftMotorSpeed = 100;
+        rightMotorSpeed = 255;
+        set_motors(leftMotorSpeed, rightMotorSpeed);
+      }
+  }
+  else if ((followPins[0] && followPins[1]) || (followPins[3] && followPins[2])) { // if at a junction, then keep moving forwards with highest priority
     turn('F');
   }
   else if (!followPins[1] && !followPins[2]) { //if all line follow sensors off
@@ -449,7 +458,7 @@ if (status == 100) {
       motor3->run(RELEASE);
       motor4->run(RELEASE);
       delay(5000);
-      detectColour();
+      detectColour(); // where it used to be but lowkey we will just do it again later to fix the bug
       lowerPortalFrame();
       delay(500);
       leftMotorSpeed = 0;
@@ -484,6 +493,7 @@ if (status == 100) {
 
   if (status == 12) { // keep spinning 180 degrees with block until line is found again
     if (followPins[1]) {
+      //detectColour(); // sneaky (or not)
       status = 3;
       if (currentBlockColour == "brown") {
         numJunctions = 3;
@@ -554,7 +564,7 @@ if (status == 100) {
       motor4->setSpeed(rightMotorSpeed);
       motor3->run(FORWARD);
       motor4->run(BACKWARD);
-      delay(1000);
+      delay(3000);
 
 
       status = 15;
