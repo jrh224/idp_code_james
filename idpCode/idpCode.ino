@@ -587,10 +587,20 @@ if (status == 100) {
           motor3->setSpeed(leftMotorSpeed);
           motor4->setSpeed(rightMotorSpeed);
           motor3->run(BACKWARD);
-          motor4->run(FORWARD);
+          motor4->run(FORWARD);  // doesn't matter if this is forward or backward bc speed = 0
+          numJunctions = 1;
           status = 7;
         }
       }
+    }
+
+
+    if (status == 6) {  // if last block colour was brown and now returning to the start box
+        if ( numJunctions== 0) {
+          // TURN left
+          // move forward INTO START BOX 
+          // THEN STOP MOVING
+        }
     }
 
 
@@ -600,16 +610,11 @@ if (status == 100) {
       }
     }
 
-
-    if (status == 6) {  // if last block colour was brown and now returning to the start box
-        if ( numJunctions== 0) {
-          // TURN RIGHT INTO START BOX THEN STOP MOVING
-        }
-    }
-
-
     if (status == 8) { // if last block colour was blue and now returning to start box
-      
-    }
+      if ( numJunctions== 0) {
+          // TURN right
+          // move forward INTO START BOX 
+          // THEN STOP MOVING
+        }
 
 }
