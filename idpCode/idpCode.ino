@@ -608,7 +608,7 @@ if (status == 100) {
     }
         if (status == 9) { // status for stopping the rotation
       if(followPins[1]){
-        lineFollow();
+        lineFollow();  // not sure if we need this line follow in here 
         status = 99; 
         } // line follow until detect outline of box
     }
@@ -620,6 +620,7 @@ if (status == 100) {
 
     if (status == 7) {  // if last block colour was blue, carry on rotating clockwise until line is found (i.e. have changed direction of robot)
       if (followPins[2]) {
+        lineFollow(); // not sure if we need this line follow in here
         status = 8;
       }
     }
@@ -633,7 +634,7 @@ if (status == 100) {
 
     if (status == 98) { // status for stopping the rotation
       if(followPins[2]){
-        lineFollow();
+        lineFollow(); // not sure if we need this line follow in here
         status = 99; 
         } // line follow until detect outline of box
     }
