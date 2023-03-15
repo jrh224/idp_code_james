@@ -45,7 +45,7 @@ int status = 100; // set back to 100 - this is waiting for button to be pressed
 // variable for storing the movement LED state, so that it can be set in the flashLED() function
 int movementLEDstate = 0;
 // variable for holding current block colour
-String currentBlockColour = ""; 
+String currentBlockColour = ""; // change to be blank
 
 // variable for counting the num of blocks that have been collected
 int numBlocksCollected = 0; 
@@ -260,7 +260,6 @@ void turn(char dir) {
       leftMotorSpeed = 0;  // bit extreme to have this at 0, may change with testing
       set_motors(leftMotorSpeed, rightMotorSpeed);
       break;
-
 
   }
 
@@ -582,13 +581,13 @@ if (status == 100) {
           status = 6;
         }
         else if ((currentBlockColour == "blue") && (numBlocksCollected==maxNumBlocks)){
-          leftMotorSpeed = speed; // pivot around right wheel (want to reverse direction of robot)
-          rightMotorSpeed = 0;
-          motor3->setSpeed(leftMotorSpeed);
-          motor4->setSpeed(rightMotorSpeed);
-          motor3->run(BACKWARD);
-          motor4->run(FORWARD);  // doesn't matter if this is forward or backward bc speed = 0
-          numJunctions = 1;
+          // turning clockwise
+          rightMotorSpeed = 100; 
+          leftMotorSpeed = speed;
+          set_motors(leftMotorSpeed, rightMotorSpeed);
+          motor4->run(BACKWARD);
+          delay(3000);
+          takeLineReadings();
           status = 7;
         }
       }
@@ -600,15 +599,19 @@ if (status == 100) {
 
 
     if (status == 6) {  // status for when last block colour was brown and now returning to the start box
-        if ( numJunctions== 0) {
+        lineFollow();
+        if (numJunctions== 0) {
           delay(500); // move forwards slightly before spinning anticlockwise
           turn('A'); // turn left / anticlockwise
+          delay(500);
           status = 9;
+          //junctionDetect();
+          takeLineReadings();
         }
     }
         if (status == 9) { // status for stopping the rotation
       if(followPins[1]){
-        lineFollow();  // not sure if we need this line follow in here 
+        //lineFollow();  // not sure if we need this line follow in here 
         status = 99; 
         } // line follow until detect outline of box
     }
@@ -620,21 +623,26 @@ if (status == 100) {
 
     if (status == 7) {  // if last block colour was blue, carry on rotating clockwise until line is found (i.e. have changed direction of robot)
       if (followPins[2]) {
-        lineFollow(); // not sure if we need this line follow in here
         status = 8;
+        numJunctions = 1;
       }
     }
     if (status == 8) { // status for when last block colour was blue and now returning to start box
+      lineFollow();
       if (numJunctions== 0) {
         delay(500);
-        turn('C'); // TURN right / clockwise
-          status = 98;
+        leftMotorSpeed = speed;
+        rightMotorSpeed = 0;
+        set_motors(leftMotorSpeed, rightMotorSpeed); // TURN right / clockwise
+        delay(500);
+        status = 98;
+        takeLineReadings();
         }
     }
 
     if (status == 98) { // status for stopping the rotation
       if(followPins[2]){
-        lineFollow(); // not sure if we need this line follow in here
+        //lineFollow(); // not sure if we need this line follow in here
         status = 99; 
         } // line follow until detect outline of box
     }
@@ -646,19 +654,20 @@ if (status == 100) {
 
 
     if (status == 99) { // status to move into and stop in the start box
-      if (followPins[0] || followPins[3]){ // when detect another junction / or when all 4 sensors detect something
+      //if (followPins[0] || followPins[3]){ // when detect another junction / or when all 4 sensors detect something
       // move forward for x seconds 
+      delay(1100);
       leftMotorSpeed = speed;
       rightMotorSpeed = speed;
-      motor3->setSpeed(leftMotorSpeed);
+      motor3->setSpeed(leftMotorSpeed+speedAdjustment);
       motor4->setSpeed(rightMotorSpeed);
       motor3->run(FORWARD);
       motor4->run(FORWARD);
-      delay(3000); // may have to change this delay after testing how long it takes for robot to fit in box
+      delay(2100); // may have to change this delay after testing how long it takes for robot to fit in box
       motor3->run(RELEASE);
       motor4->run(RELEASE); // stop moving
-      }
-      
+      status = 1000;
+      // 
     }
 
 }
